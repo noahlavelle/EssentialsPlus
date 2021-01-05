@@ -5,7 +5,9 @@ import com.noahlavelle.essentialsplus.commnds.HealCommand;
 import com.noahlavelle.essentialsplus.commnds.HealthCommand;
 import com.noahlavelle.essentialsplus.commnds.SpeedCommand;
 import com.noahlavelle.essentialsplus.games.BlockTrail;
+import com.noahlavelle.essentialsplus.games.ShrinkingCircle;
 import com.noahlavelle.essentialsplus.messages.JoinMessage;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -20,6 +22,7 @@ public class Main extends JavaPlugin {
         new HealthCommand(this);
 
         getServer().getPluginManager().registerEvents(new JoinMessage(), this);
+        getServer().getPluginManager().registerEvents(new ShrinkingCircle(this), this);
         getServer().getPluginManager().registerEvents(new BlockTrail(this), this);
         getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[CustomEssentials] Plugin is enabled");
     }
@@ -28,4 +31,5 @@ public class Main extends JavaPlugin {
     public void onDisable() {
         getServer().getConsoleSender().sendMessage(ChatColor.RED + "[CustomEssentials] Plugin is disabled");
     }
+
 }

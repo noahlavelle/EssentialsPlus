@@ -1,7 +1,7 @@
 name: EssentialsPlus
 version: 1.0
 author: Noah Lavelle
-main: com.noahlavelle.customessentials.Main
+main: com.noahlavelle.essentialsplus.Main
 api-version: 1.16
 
 commands:
@@ -29,3 +29,8 @@ commands:
     description: Sets the players health
     usage: /health <health>
     permission: custome.health
+
+  shrinkingcircle:
+    description: A game where a circle shrinks and the last player alive wins
+    usage: /shrinkingcircle <radius>
+    permission: custome.games.shrinkingcircle
