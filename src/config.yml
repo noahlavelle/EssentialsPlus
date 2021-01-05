@@ -1,0 +1,14 @@
+player_only: "[EssentialsPlus] That command can only be executed by players"
+value_too_big: "[EssentialsPlus] Provided number was too big"
+value_nan: "[EssentialsPlus] The provided value was not a number"
+
+fly:
+  enabled: "[EssentialsPlus] Fly has been enabled"
+  disabled: "[EssentialsPlus] Fly has been disabled"
+
+blocktrail:
+  enabled: "[EssentialsPlus] Blocktrail has been enabled"
+  disabled: "[EssentialsPlus] Blocktrail has been disabled"
+
+heal:
+  healed: "[EssentialsPlus] You have been healed"

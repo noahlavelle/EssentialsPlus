@@ -1,0 +1,31 @@
+name: EssentialsPlus
+version: 1.0
+author: Noah Lavelle
+main: com.noahlavelle.customessentials.Main
+api-version: 1.16
+
+commands:
+  fly:
+    description: Toggles a players flight
+    usage: /fly
+    permission: custome.fly
+
+  blocktrail:
+    description: Toggles a trail of red wool wherever the player walks
+    usage: /blocktrail
+    permission: custome.blocktrail
+
+  heal:
+    description: Heals the player
+    usage: /heal
+    permission: custome.heal
+
+  speed:
+    description: Sets the players walk and flight speed
+    usage: /speed <speed>
+    permission: custome.speed
+
+  health:
+    description: Sets the players health
+    usage: /health <health>
+    permission: custome.health
