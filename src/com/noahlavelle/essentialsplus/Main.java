@@ -20,9 +20,10 @@ public class Main extends JavaPlugin {
         new HealCommand(this);
         new SpeedCommand(this);
         new HealthCommand(this);
+        new ShrinkingCircle(this);
 
         getServer().getPluginManager().registerEvents(new JoinMessage(), this);
-        getServer().getPluginManager().registerEvents(new ShrinkingCircle(this), this);
+        getServer().getPluginManager().registerEvents(new ShrinkingCircle.Game(), this);
         getServer().getPluginManager().registerEvents(new BlockTrail(this), this);
         getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[CustomEssentials] Plugin is enabled");
     }
