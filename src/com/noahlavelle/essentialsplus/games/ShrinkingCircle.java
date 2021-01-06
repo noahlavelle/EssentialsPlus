@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -115,6 +116,19 @@ public class ShrinkingCircle implements CommandExecutor {
             game.playerDamageEvent(event);
         }
 
+        @org.bukkit.event.EventHandler
+        public void onItemPickupEvent(EntityPickupItemEvent event) {
+
+            if (!(event.getEntity() instanceof Player)) return;
+
+            Player player = (Player) event.getEntity();
+
+            Game game = getPlayersGame(player);
+            if (game == null) return;
+
+            if (game.deadPlayers.contains(player)) event.setCancelled(true);
+        }
+
         public Game getPlayersGame(Player player) {
             Game game = games.get(player.getUniqueId());
             return game;
@@ -204,6 +218,21 @@ public class ShrinkingCircle implements CommandExecutor {
             commandSender.sendMessage(ChatColor.GREEN + "[EssentialsPlus] You have successfully started a game of Shrinking Circle with:\nA size of " + strings[0]
                     + "\nA shrink size of " + strings[1] + "\n" + players.size() + " players");
 
+            if (strings[2] != null && !strings[2].equals("death") ) {
+                try {
+                    Integer.parseInt(strings[2]);
+                } catch (Exception e) {
+                    player.sendMessage(ChatColor.RED + "[EssentialsPlus] Please enter a valid shrink size - number or death");
+                    return;
+                }
+
+                for (int i = 0; i < Math.floor(radius / shrinkSize); i++) {
+                    plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                        shrinkCircleRoot(player);
+                    }, Integer.parseInt(strings[2]) * 20*i);
+                }
+            }
+
         }
 
         public void drawCircle(Location loc, Material mat, int r) {
@@ -233,37 +262,41 @@ public class ShrinkingCircle implements CommandExecutor {
             if (!(player.hasPermission("essentialsplus.games.shrinkingcircle"))) return;
 
             if (player.getInventory().getItemInMainHand().getType() == Material.RED_DYE) {
-                drawCircle(drawLocation, Material.ORANGE_CONCRETE, radius + 1);
-
-                radius -= shrinkSize;
-                drawCircle(drawLocation, Material.RED_CONCRETE, radius + 1);
-                drawCircle(drawLocation, Material.WHITE_CONCRETE, radius);
-
-                radius += 1 + shrinkSize;
-
-                for(int x = -radius; x <= radius; x++) {
-                    for(int z = -radius; z <= radius; z++) {
-                        if((x*x) + (z*z) <= (radius * radius)) {
-                            if (player.getWorld().getBlockAt(drawLocation.getBlockX() + x, drawLocation.getBlockY() ,
-                                    drawLocation.getBlockZ()  + z).getType() == Material.ORANGE_CONCRETE) {
-                                Block block = player.getWorld().getBlockAt(drawLocation.getBlockX()  + x, drawLocation.getBlockY() ,
-                                        drawLocation.getBlockZ()  + z);
-                                fallingBlocks.add(block);
-                            }
-                        }
-
-                    }
-                }
-
-
-
-                Random rand = new Random(System.currentTimeMillis());
-
-                radius -= 1 + shrinkSize;
-
-                dropRandom(player, rand);
+                shrinkCircleRoot(player);
             }
             return;
+        }
+
+        public void shrinkCircleRoot(Player player) {
+            drawCircle(drawLocation, Material.ORANGE_CONCRETE, radius + 1);
+
+            radius -= shrinkSize;
+            drawCircle(drawLocation, Material.RED_CONCRETE, radius + 1);
+            drawCircle(drawLocation, Material.WHITE_CONCRETE, radius);
+
+            radius += 1 + shrinkSize;
+
+            for(int x = -radius; x <= radius; x++) {
+                for(int z = -radius; z <= radius; z++) {
+                    if((x*x) + (z*z) <= (radius * radius)) {
+                        if (player.getWorld().getBlockAt(drawLocation.getBlockX() + x, drawLocation.getBlockY() ,
+                                drawLocation.getBlockZ()  + z).getType() == Material.ORANGE_CONCRETE) {
+                            Block block = player.getWorld().getBlockAt(drawLocation.getBlockX()  + x, drawLocation.getBlockY() ,
+                                    drawLocation.getBlockZ()  + z);
+                            fallingBlocks.add(block);
+                        }
+                    }
+
+                }
+            }
+
+
+
+            Random rand = new Random(System.currentTimeMillis());
+
+            radius -= 1 + shrinkSize;
+
+            dropRandom(player, rand);
         }
 
         public void playerMove(PlayerMoveEvent event) {
@@ -283,6 +316,10 @@ public class ShrinkingCircle implements CommandExecutor {
 
             Player killed = event.getEntity();
             Player killer = event.getEntity().getKiller();
+
+            if (strings[2].equals("death")) {
+                shrinkCircleRoot(killer);
+            }
 
             killer.playSound(killer.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 0.5F);
             killed.setHealth(20);
@@ -332,7 +369,6 @@ public class ShrinkingCircle implements CommandExecutor {
                 }
             }, 1L);
         }
-
         public void win(Player player) {
             for (int i = 0; i < 25; i++) {
                 plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
