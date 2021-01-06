@@ -32,5 +32,5 @@ commands:
 
   shrinkingcircle:
     description: A game where a circle shrinks and the last player alive wins
-    usage: /shrinkingcircle <radius>
+    usage: /shrinkingcircle <radius> <shrink size>
     permission: custome.games.shrinkingcircle

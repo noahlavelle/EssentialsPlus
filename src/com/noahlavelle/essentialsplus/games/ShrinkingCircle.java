@@ -1,6 +1,7 @@
 package com.noahlavelle.essentialsplus.games;
 
 import com.noahlavelle.essentialsplus.Main;
+import com.noahlavelle.essentialsplus.utils.RandomFirework;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
@@ -8,6 +9,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,20 +19,22 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.FireworkEffectMeta;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
 public class ShrinkingCircle implements CommandExecutor {
 
     private Main plugin;
 
+    static Map<UUID, Game> games = new HashMap<>();
+
     public ShrinkingCircle (Main plugin) {
         this.plugin = plugin;
         plugin.getCommand("shrinkingcircle").setExecutor(this);
     }
-
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
@@ -54,8 +59,68 @@ public class ShrinkingCircle implements CommandExecutor {
         }
 
         Game game = new Game(commandSender, command, s, strings, plugin, player.getLocation());
+        for (Player p : game.players) {
+            games.put(p.getUniqueId(), game);
+        }
 
         return true;
+    }
+
+    public static class EventHandler implements Listener {
+
+        @org.bukkit.event.EventHandler
+        public void onPlayerInteract(PlayerInteractEvent event) {
+
+            Player player = event.getPlayer();
+
+            Game game = getPlayersGame(player);
+            if (game == null) return;
+
+            game.shrinkCircle(event);
+        }
+
+        @org.bukkit.event.EventHandler
+        public void onPlayerMove(PlayerMoveEvent event) {
+
+            Player player = event.getPlayer();
+
+            Game game = getPlayersGame(player);
+            if (game == null) return;
+
+            game.playerMove(event);
+        }
+
+        @org.bukkit.event.EventHandler
+        public void onPlayerDeathEvent(PlayerDeathEvent event) {
+
+            Player player = event.getEntity();
+
+            Game game = getPlayersGame(player);
+            if (game == null) return;
+
+            game.playerDeath(event);
+
+        }
+
+        @org.bukkit.event.EventHandler
+        public void onPlayerDamageEvent(EntityDamageEvent event) {
+
+            if (!(event.getEntity() instanceof Player)) return;
+
+            Player player = (Player) event.getEntity();
+
+            Game game = getPlayersGame(player);
+            if (game == null) return;
+
+            game.playerDamageEvent(event);
+        }
+
+        public Game getPlayersGame(Player player) {
+            Game game = games.get(player.getUniqueId());
+            return game;
+
+        }
+
     }
 
     public static class Game implements Listener {
@@ -73,7 +138,7 @@ public class ShrinkingCircle implements CommandExecutor {
         int radius;
         Location drawLocation;
 
-        public Game (CommandSender commandSender, Command command, String s, String[] strings, Main plugin, Location drawLocation) {
+        public Game(CommandSender commandSender, Command command, String s, String[] strings, Main plugin, Location drawLocation) {
             this.commandSender = commandSender;
             this.command = command;
             this.strings = strings;
@@ -86,7 +151,7 @@ public class ShrinkingCircle implements CommandExecutor {
             run();
         }
 
-        public Game () {
+        public Game() {
             // Overloading game
         }
 
@@ -94,11 +159,13 @@ public class ShrinkingCircle implements CommandExecutor {
 
             Player player = (Player) commandSender;
 
-            System.out.println(drawLocation);
+            new EventHandler();
 
             for (Entity entity : player.getNearbyEntities(50, 50, 50)) {
                 if (entity instanceof Player) players.add((Player) entity);
             }
+
+            players.add(player);
 
             ItemStack item = new ItemStack(Material.RED_DYE, 1);
             ItemMeta meta = item.getItemMeta();
@@ -159,25 +226,24 @@ public class ShrinkingCircle implements CommandExecutor {
             }
         }
 
-        @EventHandler
-        public void onPlayerInteract(PlayerInteractEvent event) {
+        public void shrinkCircle(PlayerInteractEvent event) {
             Player player = event.getPlayer();
+
 
             if (!(player.hasPermission("essentialsplus.games.shrinkingcircle"))) return;
 
             if (player.getInventory().getItemInMainHand().getType() == Material.RED_DYE) {
                 drawCircle(drawLocation, Material.ORANGE_CONCRETE, radius + 1);
+
                 radius -= shrinkSize;
                 drawCircle(drawLocation, Material.RED_CONCRETE, radius + 1);
                 drawCircle(drawLocation, Material.WHITE_CONCRETE, radius);
 
-                radius -= (1 + shrinkSize);
-
-                int radiusSquared = radius * radius;
+                radius += 1 + shrinkSize;
 
                 for(int x = -radius; x <= radius; x++) {
                     for(int z = -radius; z <= radius; z++) {
-                        if((x*x) + (z*z) <= radiusSquared) {
+                        if((x*x) + (z*z) <= (radius * radius)) {
                             if (player.getWorld().getBlockAt(drawLocation.getBlockX() + x, drawLocation.getBlockY() ,
                                     drawLocation.getBlockZ()  + z).getType() == Material.ORANGE_CONCRETE) {
                                 Block block = player.getWorld().getBlockAt(drawLocation.getBlockX()  + x, drawLocation.getBlockY() ,
@@ -189,16 +255,18 @@ public class ShrinkingCircle implements CommandExecutor {
                     }
                 }
 
+
+
                 Random rand = new Random(System.currentTimeMillis());
-                dropRandom(plugin, fallingBlocks, player, rand);
 
                 radius -= 1 + shrinkSize;
+
+                dropRandom(player, rand);
             }
             return;
         }
 
-        @EventHandler
-        public void onPlayerMove(PlayerMoveEvent event) {
+        public void playerMove(PlayerMoveEvent event) {
             Player movedPlayer = event.getPlayer();
 
             if (!players.contains(movedPlayer)) {
@@ -210,9 +278,8 @@ public class ShrinkingCircle implements CommandExecutor {
             }
         }
 
-        @EventHandler
-        public void onPlayerDeathEvent(PlayerDeathEvent event) {
-            if (!(event.getEntity() instanceof Player) || !(event.getEntity().getKiller() instanceof Player)) return;
+        public void playerDeath(PlayerDeathEvent event) {
+            if (!(event.getEntity().getKiller() instanceof Player)) return;
 
             Player killed = event.getEntity();
             Player killer = event.getEntity().getKiller();
@@ -221,19 +288,15 @@ public class ShrinkingCircle implements CommandExecutor {
             killed.setHealth(20);
 
             setPlayerSpectate(event.getEntity());
-
         }
 
-        @EventHandler
-        public void onPlayerDamageEvent(EntityDamageEvent event) {
+        public void playerDamageEvent(EntityDamageEvent event) {
             if (deadPlayers.contains(event.getEntity())) {
                 event.setCancelled(true);
             }
         }
 
         public void setPlayerSpectate(Player player) {
-            player.setAllowFlight(true);
-            player.setFlying(true);
             player.getInventory().clear();
 
             player.setWalkSpeed(0.4F);
@@ -249,22 +312,43 @@ public class ShrinkingCircle implements CommandExecutor {
 
             players.remove(player);
             deadPlayers.add(player);
+
+            player.setAllowFlight(true);
+            player.setFlying(true);
+
+            System.out.println((players.size()));
+            if (players.size() == 1) {
+                win(players.get(0));
+            }
         }
 
-        public void dropRandom(Main plugin, ArrayList<Block> fallingBlocks, Player player, Random rand) {
+        public void dropRandom(Player player, Random rand) {
             plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-                Block[] blocks = {fallingBlocks.get(rand.nextInt(fallingBlocks.size())), fallingBlocks.get(rand.nextInt(fallingBlocks.size())),
-                        fallingBlocks.get(rand.nextInt(fallingBlocks.size())), fallingBlocks.get(rand.nextInt(fallingBlocks.size()))};
-                for (Block block : blocks) {
-                    block.setType(Material.AIR);
-                    player.getWorld().spawnFallingBlock(block.getLocation(), Material.ORANGE_CONCRETE, (byte) 0);
-                    fallingBlocks.remove(block);
-                }
-
                 if (!fallingBlocks.isEmpty()) {
-                    dropRandom(plugin, fallingBlocks, player, rand);
+                Block block = fallingBlocks.get(rand.nextInt(fallingBlocks.size()));
+                block.setType(Material.AIR);
+                player.getWorld().spawnFallingBlock(block.getLocation(), Material.ORANGE_CONCRETE, (byte) 0);
+                fallingBlocks.remove(block);
+                    dropRandom(player, rand);
                 }
             }, 1L);
+        }
+
+        public void win(Player player) {
+            for (int i = 0; i < 25; i++) {
+                plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                    RandomFirework.spawnRandomFirework(player.getLocation());
+                }, 5 * i);
+            }
+
+
+            player.sendTitle(ChatColor.GOLD + player.getName() + " has won!", ChatColor.GOLD + "Congratulations!", 10, 100, 20);
+            players.remove(player);
+            for (Player p : deadPlayers) {
+                p.setInvisible(false);
+                p.setDisplayName(player.getName());
+                p.setPlayerListName(player.getName());
+            }
         }
     }
 }

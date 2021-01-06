@@ -23,7 +23,7 @@ public class Main extends JavaPlugin {
         new ShrinkingCircle(this);
 
         getServer().getPluginManager().registerEvents(new JoinMessage(), this);
-        getServer().getPluginManager().registerEvents(new ShrinkingCircle.Game(), this);
+        getServer().getPluginManager().registerEvents(new ShrinkingCircle.EventHandler(), this);
         getServer().getPluginManager().registerEvents(new BlockTrail(this), this);
         getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[CustomEssentials] Plugin is enabled");
     }
