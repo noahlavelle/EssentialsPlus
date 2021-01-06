@@ -316,7 +316,6 @@ public class ShrinkingCircle implements CommandExecutor {
             player.setAllowFlight(true);
             player.setFlying(true);
 
-            System.out.println((players.size()));
             if (players.size() == 1) {
                 win(players.get(0));
             }
@@ -345,12 +344,17 @@ public class ShrinkingCircle implements CommandExecutor {
             player.sendTitle(ChatColor.GOLD + player.getName() + " has won!", ChatColor.GOLD + "Congratulations!", 10, 100, 20);
             player.setInvisible(false);
             players.remove(player);
+            games.remove(player.getUniqueId());
             for (Player p : deadPlayers) {
+                p.teleport(player);
                 p.setInvisible(false);
                 p.setDisplayName(player.getName());
                 p.setPlayerListName(player.getName());
                 p.setAllowFlight(false);
                 p.setFlying(false);
+                p.setGameMode(GameMode.SURVIVAL);
+                deadPlayers.remove(p);
+                games.remove(p.getUniqueId());
             }
         }
     }
