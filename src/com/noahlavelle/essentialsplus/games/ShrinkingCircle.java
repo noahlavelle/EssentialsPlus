@@ -344,12 +344,14 @@ public class ShrinkingCircle implements CommandExecutor {
             player.sendTitle(ChatColor.GOLD + player.getName() + " has won!", ChatColor.GOLD + "Congratulations!", 10, 100, 20);
             player.setInvisible(false);
             players.remove(player);
+            player.setDisplayName(player.getName());
+            player.setPlayerListName(player.getName());
             games.remove(player.getUniqueId());
             for (Player p : deadPlayers) {
                 p.teleport(player);
                 p.setInvisible(false);
-                p.setDisplayName(player.getName());
-                p.setPlayerListName(player.getName());
+                p.setDisplayName(p.getName());
+                p.setPlayerListName(p.getName());
                 p.setAllowFlight(false);
                 p.setFlying(false);
                 p.setGameMode(GameMode.SURVIVAL);
