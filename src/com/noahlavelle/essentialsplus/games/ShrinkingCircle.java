@@ -349,6 +349,8 @@ public class ShrinkingCircle implements CommandExecutor {
                 p.setInvisible(false);
                 p.setDisplayName(player.getName());
                 p.setPlayerListName(player.getName());
+                p.setAllowFlight(false);
+                p.setFlying(false);
             }
         }
     }
