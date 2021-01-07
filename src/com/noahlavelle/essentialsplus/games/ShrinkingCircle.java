@@ -14,27 +14,166 @@ import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.FireworkEffectMeta;
 import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
-public class ShrinkingCircle implements CommandExecutor {
+public class ShrinkingCircle implements CommandExecutor, Listener {
 
     private Main plugin;
 
     static Map<UUID, Game> games = new HashMap<>();
 
+    private Inventory gui;
+    private int awaitingValueStage = 0;
+    private Player activeGuiPlayer;
+    private String[] args = {"50", "1", ""};
+
     public ShrinkingCircle (Main plugin) {
         this.plugin = plugin;
         plugin.getCommand("shrinkingcircle").setExecutor(this);
+    }
+
+    @org.bukkit.event.EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        if (event.getInventory() != gui) return;
+
+        event.setCancelled(true);
+
+        final ItemStack clickedItem = event.getCurrentItem();
+
+        if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
+
+        Player player = (Player) event.getWhoClicked();
+        activeGuiPlayer = player;
+
+        switch (event.getRawSlot()) {
+            case 11:
+                player.closeInventory();
+                player.sendMessage(ChatColor.GREEN + "Please enter a value for the radius:");
+                awaitingValueStage = 1;
+            break;
+            case 13:
+                player.closeInventory();
+                player.sendMessage(ChatColor.GREEN + "Please enter a value for the shrink size:");
+                awaitingValueStage = 2;
+            break;
+            case 6:
+            case 15:
+            case 24:
+                ItemStack item = new ItemStack(Material.getMaterial(plugin.getConfig().getString("shrinkingcircle.gui." + + (event.getRawSlot() + 1) + ".item")), 1);
+                ItemMeta meta = item.getItemMeta();
+                meta.setDisplayName(plugin.getConfig().getString("shrinkingcircle.gui." + + (event.getRawSlot() + 1) + ".name"));
+                item.setItemMeta(meta);
+                gui.setItem(event.getRawSlot(), item);
+
+                gui.setItem(event.getRawSlot(), item);
+
+                for (int slot = 6; slot <= 24; slot += 9) {
+                    if (slot != event.getRawSlot()) {
+                        item = new ItemStack(Material.getMaterial(plugin.getConfig().getString("shrinkingcircle.gui." + + (slot + 1) + ".item_off")), 1);
+                        meta = item.getItemMeta();
+                        meta.setDisplayName(plugin.getConfig().getString("shrinkingcircle.gui." + + (slot + 1) + ".name"));
+                        item.setItemMeta(meta);
+                        gui.setItem(slot, item);
+                    }
+                }
+
+                if (event.getRawSlot() == 6) {
+                    args[2] = "";
+                } else if (event.getRawSlot() == 15) {
+                    player.closeInventory();
+                    player.sendMessage(ChatColor.GREEN + "Please enter a time value (seconds) for the automatic shrink:");
+                    awaitingValueStage = 3;
+            } else if (event.getRawSlot() == 24) {
+                    args[2] = "death";
+                }
+
+            break;
+
+
+            case 26:
+                Game game = new Game(player, args, plugin, player.getLocation());
+                for (Player p : game.players) {
+                    games.put(p.getUniqueId(), game);
+                }
+            break;
+        }
+
+    }
+
+    @org.bukkit.event.EventHandler
+    public void onAsyncChatEvent(PlayerChatEvent event) {
+        if (!(event.getPlayer() instanceof Player)) return;
+
+        Player player = event.getPlayer();
+
+        if (player != activeGuiPlayer) return;
+
+        switch (awaitingValueStage) {
+            case 1:
+                try {
+
+                    Integer.parseInt(event.getMessage());
+
+                } catch (Exception e) {
+                    player.sendMessage(ChatColor.RED + "[Shrinking Circle] Invalid value\n" + ChatColor.GREEN + "Please enter a value for the radius:");
+                    event.setCancelled(true);
+                    return;
+                }
+
+                args[0] = event.getMessage();
+                activeGuiPlayer.openInventory(gui);
+                event.setCancelled(true);
+            break;
+            case 2:
+                try {
+
+                    Integer.parseInt(event.getMessage());
+
+                } catch (Exception e) {
+                    player.sendMessage(ChatColor.RED + "[Shrinking Circle] Invalid value\n" + ChatColor.GREEN + "Please enter a value for the shrink size:");
+                    event.setCancelled(true);
+                    return;
+                }
+
+                args[1] = event.getMessage();
+                activeGuiPlayer.openInventory(gui);
+                event.setCancelled(true);
+            break;
+            case 3:
+                try {
+
+                    Integer.parseInt(event.getMessage());
+
+                } catch (Exception e) {
+                    player.sendMessage(ChatColor.RED + "[Shrinking Circle] Invalid value\n" + ChatColor.GREEN + "Please enter a time value (seconds) for the automatic shrink:");
+                    event.setCancelled(true);
+                    return;
+                }
+
+                args[2] = event.getMessage();
+                activeGuiPlayer.openInventory(gui);
+                event.setCancelled(true);
+
+            break;
+        }
+
+        player.openInventory(gui);
     }
 
     @Override
@@ -47,23 +186,49 @@ public class ShrinkingCircle implements CommandExecutor {
 
         Player player = ((Player) commandSender).getPlayer();
 
-        if (Integer.parseInt(strings[0]) > 150) {
-            strings[0] = "150";
-        }  else if (Integer.parseInt(strings[0]) < 1) {
-            strings[0] = "1";
-        }
+        if (strings.length == 0) {
+            gui = Bukkit.createInventory(null, 27, "Shrinking Circle");
 
-        if (Integer.parseInt(strings[1]) > 150) {
-            strings[0] = "150";
-        }  else if (Integer.parseInt(strings[1]) < 1) {
-            strings[0] = "1";
-        }
+            for (int i = 0; i <= 26; i++) {
+                Material material = Material.getMaterial(plugin.getConfig().getString("shrinkingcircle.gui." + (i + 1) + ".item"));
+                String name = plugin.getConfig().getString("shrinkingcircle.gui." + (i + 1) + ".name");
+                String lore = plugin.getConfig().getString("shrinkingcircle.gui." + (i + 1) + ".lore");
 
-        Game game = new Game(commandSender, command, s, strings, plugin, player.getLocation());
-        for (Player p : game.players) {
-            games.put(p.getUniqueId(), game);
-        }
+                ItemStack item = new ItemStack(material, 1);
+                ItemMeta meta = item.getItemMeta();
 
+                meta.setDisplayName(name);
+
+                item.setItemMeta(meta);
+
+                gui.setItem(i, item);
+            }
+
+            ItemStack replacementItem = new ItemStack(Material.getMaterial(plugin.getConfig().getString("shrinkingcircle.gui.16.item_off")));
+            gui.setItem(15, replacementItem);
+            replacementItem = new ItemStack(Material.getMaterial(plugin.getConfig().getString("shrinkingcircle.gui.25.item_off")));
+            gui.setItem(24, replacementItem);
+
+            player.openInventory(gui);
+        } else {
+
+            if (Integer.parseInt(strings[0]) > 150) {
+                strings[0] = "150";
+            } else if (Integer.parseInt(strings[0]) < 1) {
+                strings[0] = "1";
+            }
+
+            if (Integer.parseInt(strings[1]) > 150) {
+                strings[0] = "150";
+            } else if (Integer.parseInt(strings[1]) < 1) {
+                strings[0] = "1";
+            }
+
+            Game game = new Game(commandSender, command, s, strings, plugin, player.getLocation());
+            for (Player p : game.players) {
+                games.put(p.getUniqueId(), game);
+            }
+        }
         return true;
     }
 
@@ -129,6 +294,17 @@ public class ShrinkingCircle implements CommandExecutor {
             if (game.deadPlayers.contains(player)) event.setCancelled(true);
         }
 
+        @org.bukkit.event.EventHandler
+        public void onBlockPLaceEvent(BlockPlaceEvent event) {
+
+            Player player = (Player) event.getPlayer();
+
+            Game game = getPlayersGame(player);
+            if (game == null) return;
+
+            game.removeOutsideBlocks(event);
+        }
+
         public Game getPlayersGame(Player player) {
             Game game = games.get(player.getUniqueId());
             return game;
@@ -139,6 +315,7 @@ public class ShrinkingCircle implements CommandExecutor {
 
     public static class Game implements Listener {
 
+        public Player player;
         Command command;
         String[] strings;
         CommandSender commandSender;
@@ -155,6 +332,18 @@ public class ShrinkingCircle implements CommandExecutor {
         public Game(CommandSender commandSender, Command command, String s, String[] strings, Main plugin, Location drawLocation) {
             this.commandSender = commandSender;
             this.command = command;
+            this.strings = strings;
+            this.plugin = plugin;
+
+            this.drawLocation = drawLocation;
+            this.shrinkSize = Integer.parseInt(strings[1]);
+            this.radius = Integer.parseInt(strings[0]);
+
+            run();
+        }
+
+        public Game(Player commandSender, String[] strings, Main plugin, Location drawLocation) {
+            this.commandSender = commandSender;
             this.strings = strings;
             this.plugin = plugin;
 
@@ -199,34 +388,43 @@ public class ShrinkingCircle implements CommandExecutor {
                         selectedPlayer.getLocation().getYaw(), 0);
                 selectedPlayer.teleport(location);
 
-                selectedPlayer.getInventory().addItem(new ItemStack(Material.DIAMOND_SWORD, 1));
-                selectedPlayer.getInventory().addItem(new ItemStack(Material.DIAMOND_AXE, 1));
-                selectedPlayer.getInventory().addItem(new ItemStack(Material.BOW, 1));
-                selectedPlayer.getInventory().addItem(new ItemStack(Material.SHIELD, 1));
-                selectedPlayer.getInventory().addItem(new ItemStack(Material.ARROW, 64));
-                selectedPlayer.getInventory().addItem(new ItemStack(Material.RED_WOOL, 128));
+                if (selectedPlayer != player) {
+                    selectedPlayer.getInventory().addItem(new ItemStack(Material.DIAMOND_SWORD, 1));
+                    selectedPlayer.getInventory().addItem(new ItemStack(Material.DIAMOND_AXE, 1));
+                    selectedPlayer.getInventory().addItem(new ItemStack(Material.BOW, 1));
+                    selectedPlayer.getInventory().addItem(new ItemStack(Material.SHIELD, 1));
+                    selectedPlayer.getInventory().addItem(new ItemStack(Material.ARROW, 64));
+                    selectedPlayer.getInventory().addItem(new ItemStack(Material.RED_WOOL, 128));
 
-                selectedPlayer.getInventory().setBoots(new ItemStack(Material.IRON_BOOTS));
-                selectedPlayer.getInventory().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
-                selectedPlayer.getInventory().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
-                selectedPlayer.getInventory().setHelmet(new ItemStack(Material.IRON_HELMET));
+                    selectedPlayer.getInventory().setBoots(new ItemStack(Material.IRON_BOOTS));
+                    selectedPlayer.getInventory().setLeggings(new ItemStack(Material.IRON_LEGGINGS));
+                    selectedPlayer.getInventory().setChestplate(new ItemStack(Material.IRON_CHESTPLATE));
+                    selectedPlayer.getInventory().setHelmet(new ItemStack(Material.IRON_HELMET));
+                }
 
                 selectedPlayer.setDisplayName(ChatColor.AQUA + "[Shrinking Circle] " + selectedPlayer.getName() + ChatColor.RESET);
                 selectedPlayer.setPlayerListName(ChatColor.AQUA + "[Shrinking Circle] " + selectedPlayer.getName() + ChatColor.RESET);
+
+                if (selectedPlayer == player) {
+                    selectedPlayer.setDisplayName(ChatColor.GOLD + "[Shrinking Circle] [Host] " + selectedPlayer.getName() + ChatColor.RESET);
+                    selectedPlayer.setPlayerListName(ChatColor.GOLD + "[Shrinking Circle] [Host] " + selectedPlayer.getName() + ChatColor.RESET);
+                }
             }
 
-            commandSender.sendMessage(ChatColor.GREEN + "[EssentialsPlus] You have successfully started a game of Shrinking Circle with:\nA size of " + strings[0]
+            commandSender.sendMessage(ChatColor.GREEN + "[Shrinking Circle] You have successfully started a game of Shrinking Circle with:\nA size of " + strings[0]
                     + "\nA shrink size of " + strings[1] + "\n" + players.size() + " players");
 
-            if (strings[2] != null && !strings[2].equals("death") ) {
+            if (strings.length < 3) return;
+
+            if (!strings[2].equals("death") ) {
                 try {
                     Integer.parseInt(strings[2]);
                 } catch (Exception e) {
-                    player.sendMessage(ChatColor.RED + "[EssentialsPlus] Please enter a valid shrink size - number or death");
+                    player.sendMessage(ChatColor.RED + "[Shrinking Circle] Please enter a valid shrink size - number or death");
                     return;
                 }
 
-                for (int i = 0; i < Math.floor(radius / shrinkSize); i++) {
+                for (int i = 0; i < Math.floor(radius / shrinkSize) + 1; i++) {
                     plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
                         shrinkCircleRoot(player);
                     }, Integer.parseInt(strings[2]) * 20*i);
@@ -267,7 +465,29 @@ public class ShrinkingCircle implements CommandExecutor {
             return;
         }
 
+        public void removeOutsideBlocks(BlockPlaceEvent event) {
+            int cx = drawLocation.getBlockX();
+            int cz = drawLocation.getBlockZ();
+            World w = drawLocation.getWorld();
+
+            int r = radius + 1;
+            int rSquared = r * r;
+            for (int x = cx - r; x <= cx + r; x++) {
+                for (int z = cz - r; z <= cz + r; z++) {
+
+                    if (((cx - x) * (cx - x) == 0 & (cz - z) * (cz - z) == rSquared) | ((cx - x) * (cx - x) == rSquared & (cz - z) * (cz - z) == 0)) {
+                        w.getBlockAt(x, event.getBlock().getY(), z).setType(Material.AIR);
+                    }
+
+                    if ((cx - x) * (cx - x) + (cz - z) * (cz - z) > rSquared) {
+                        w.getBlockAt(x, event.getBlock().getY(), z).setType(Material.AIR);
+                    }
+                }
+            }
+        }
+
         public void shrinkCircleRoot(Player player) {
+
             drawCircle(drawLocation, Material.ORANGE_CONCRETE, radius + 1);
 
             radius -= shrinkSize;
@@ -353,8 +573,8 @@ public class ShrinkingCircle implements CommandExecutor {
             player.setAllowFlight(true);
             player.setFlying(true);
 
-            if (players.size() == 1) {
-                win(players.get(0));
+            if (players.size() == 2) {
+                win(players.get(1));
             }
         }
 
@@ -365,7 +585,13 @@ public class ShrinkingCircle implements CommandExecutor {
                 block.setType(Material.AIR);
                 player.getWorld().spawnFallingBlock(block.getLocation(), Material.ORANGE_CONCRETE, (byte) 0);
                 fallingBlocks.remove(block);
-                    dropRandom(player, rand);
+                dropRandom(player, rand);
+                } else {
+                    for (Block block : fallingBlocks) {
+                        player.getWorld().spawnFallingBlock(block.getLocation(), block.getType(), (byte) 0);
+                        block.setType(Material.AIR);
+                        fallingBlocks.remove(block);
+                    }
                 }
             }, 1L);
         }

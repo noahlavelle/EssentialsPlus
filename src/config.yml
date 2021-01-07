@@ -12,3 +12,117 @@ blocktrail:
 
 heal:
   healed: "[EssentialsPlus] You have been healed"
+
+shrinkingcircle:
+  gui:
+    1:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    2:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    3:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    4:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    5:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    6:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    7:
+      item: RED_DYE
+      item_off: GRAY_DYE
+      name: 'Manual'
+      lore: ''
+    8:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    9:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    10:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    11:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    12:
+      item: TORCH
+      name: 'Circle Radius'
+      lore: ''
+    13:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    14:
+      item: EMERALD
+      name: 'Shrink Size'
+      lore: ''
+    15:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    16:
+      item: REDSTONE
+      item_off: GUNPOWDER
+      name: 'Automatic'
+      lore: ''
+    17:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    18:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    19:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    20:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    21:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    22:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    23:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    24:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    25:
+      item: WITHER_SKELETON_SKULL
+      item_off: SKELETON_SKULL
+      name: 'On Death'
+      lore: ''
+    26:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    27:
+      item: NETHER_STAR
+      name: 'Start'
+      lore: ''
