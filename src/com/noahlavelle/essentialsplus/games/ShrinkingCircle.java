@@ -1,32 +1,28 @@
 package com.noahlavelle.essentialsplus.games;
 
 import com.noahlavelle.essentialsplus.Main;
+import com.noahlavelle.essentialsplus.utils.CreateGui;
 import com.noahlavelle.essentialsplus.utils.RandomFirework;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Firework;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.FireworkEffectMeta;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.lang.reflect.Array;
@@ -37,6 +33,7 @@ public class ShrinkingCircle implements CommandExecutor, Listener {
     private Main plugin;
 
     static Map<UUID, Game> games = new HashMap<>();
+    static Map<UUID, Inventory> guis = new HashMap<>();
 
     private Inventory gui;
     private int awaitingValueStage = 0;
@@ -50,6 +47,7 @@ public class ShrinkingCircle implements CommandExecutor, Listener {
 
     @org.bukkit.event.EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
+        gui = guis.get(event.getWhoClicked().getUniqueId());
         if (event.getInventory() != gui) return;
 
         event.setCancelled(true);
@@ -187,22 +185,7 @@ public class ShrinkingCircle implements CommandExecutor, Listener {
         Player player = ((Player) commandSender).getPlayer();
 
         if (strings.length == 0) {
-            gui = Bukkit.createInventory(null, 27, "Shrinking Circle");
-
-            for (int i = 0; i <= 26; i++) {
-                Material material = Material.getMaterial(plugin.getConfig().getString("shrinkingcircle.gui." + (i + 1) + ".item"));
-                String name = plugin.getConfig().getString("shrinkingcircle.gui." + (i + 1) + ".name");
-                String lore = plugin.getConfig().getString("shrinkingcircle.gui." + (i + 1) + ".lore");
-
-                ItemStack item = new ItemStack(material, 1);
-                ItemMeta meta = item.getItemMeta();
-
-                meta.setDisplayName(name);
-
-                item.setItemMeta(meta);
-
-                gui.setItem(i, item);
-            }
+            gui = new CreateGui(plugin, "shrinkingcircle.gui.", "Shrinking Circle").createGui();
 
             ItemStack replacementItem = new ItemStack(Material.getMaterial(plugin.getConfig().getString("shrinkingcircle.gui.16.item_off")));
             gui.setItem(15, replacementItem);
@@ -210,6 +193,8 @@ public class ShrinkingCircle implements CommandExecutor, Listener {
             gui.setItem(24, replacementItem);
 
             player.openInventory(gui);
+
+            guis.put(player.getUniqueId(), gui);
         } else {
 
             if (Integer.parseInt(strings[0]) > 150) {
@@ -246,7 +231,7 @@ public class ShrinkingCircle implements CommandExecutor, Listener {
         }
 
         @org.bukkit.event.EventHandler
-        public void onPlayerMove(PlayerMoveEvent event) {
+        public void onPlayerMoveEvent(PlayerMoveEvent event) {
 
             Player player = event.getPlayer();
 
@@ -302,7 +287,7 @@ public class ShrinkingCircle implements CommandExecutor, Listener {
             Game game = getPlayersGame(player);
             if (game == null) return;
 
-            game.removeOutsideBlocks(event);
+            game.removeOutsideBlocks(event.getPlayer(), event.getBlock().getY());
         }
 
         public Game getPlayersGame(Player player) {
@@ -465,22 +450,24 @@ public class ShrinkingCircle implements CommandExecutor, Listener {
             return;
         }
 
-        public void removeOutsideBlocks(BlockPlaceEvent event) {
+        public void removeOutsideBlocks(Player player, int y) {
             int cx = drawLocation.getBlockX();
             int cz = drawLocation.getBlockZ();
             World w = drawLocation.getWorld();
 
             int r = radius + 1;
             int rSquared = r * r;
-            for (int x = cx - r; x <= cx + r; x++) {
-                for (int z = cz - r; z <= cz + r; z++) {
-
-                    if (((cx - x) * (cx - x) == 0 & (cz - z) * (cz - z) == rSquared) | ((cx - x) * (cx - x) == rSquared & (cz - z) * (cz - z) == 0)) {
-                        w.getBlockAt(x, event.getBlock().getY(), z).setType(Material.AIR);
-                    }
-
-                    if ((cx - x) * (cx - x) + (cz - z) * (cz - z) > rSquared) {
-                        w.getBlockAt(x, event.getBlock().getY(), z).setType(Material.AIR);
+            for (int x = cx - Integer.parseInt(strings[0] + 1); x <= cx + Integer.parseInt(strings[0] + 1); x++) {
+                for (int z = cz - Integer.parseInt(strings[0] + 1); z <= cz + Integer.parseInt(strings[0] + 1); z++) {
+                    if (((cx - x) * (cx - x) + (cz - z) * (cz - z) > rSquared | (((cx - x) * (cx - x) == 0 & (cz - z) * (cz - z) == rSquared) | ((cx - x) * (cx - x) == rSquared & (cz - z) * (cz - z) == 0)))) {
+                        Block block = w.getBlockAt(x, y, z);
+                        Material blockType = block.getType();
+                        Location blockLocation = block.getLocation();
+                        if (!(blockType == Material.AIR)) {
+                            block.setType(Material.AIR);
+                            Location location = new Location(player.getWorld(), blockLocation.getBlockX() + 0.5, blockLocation.getBlockY() + 0.0, blockLocation.getBlockZ() + 0.5);
+                            player.getWorld().spawnFallingBlock(location, blockType, (byte) 0);
+                        }
                     }
                 }
             }
@@ -510,8 +497,6 @@ public class ShrinkingCircle implements CommandExecutor, Listener {
                 }
             }
 
-
-
             Random rand = new Random(System.currentTimeMillis());
 
             radius -= 1 + shrinkSize;
@@ -526,8 +511,14 @@ public class ShrinkingCircle implements CommandExecutor, Listener {
                 return;
             }
 
-            if (movedPlayer.getLocation().getBlockY() < drawLocation.getBlockY() - 10) {
-                setPlayerSpectate(movedPlayer);
+            if (movedPlayer != commandSender) {
+                if (movedPlayer.getLocation().getBlockY() < drawLocation.getBlockY() - 10) {
+                    setPlayerSpectate(movedPlayer);
+                }
+
+                if (movedPlayer.getLocation().getBlockY() == drawLocation.getBlockY() + 12) {
+                    movedPlayer.teleport(new Location (movedPlayer.getWorld(), movedPlayer.getLocation().getBlockX(), movedPlayer.getLocation().getBlockY() - 10, movedPlayer.getLocation().getBlockZ()));
+                }
             }
         }
 
@@ -583,14 +574,13 @@ public class ShrinkingCircle implements CommandExecutor, Listener {
                 if (!fallingBlocks.isEmpty()) {
                 Block block = fallingBlocks.get(rand.nextInt(fallingBlocks.size()));
                 block.setType(Material.AIR);
-                player.getWorld().spawnFallingBlock(block.getLocation(), Material.ORANGE_CONCRETE, (byte) 0);
+                Location location = new Location(player.getWorld(), block.getLocation().getBlockX() + 0.5, block.getLocation().getBlockY() + 0.0, block.getLocation().getBlockZ() + 0.5);
+                player.getWorld().spawnFallingBlock(location, Material.ORANGE_CONCRETE, (byte) 0);
                 fallingBlocks.remove(block);
                 dropRandom(player, rand);
                 } else {
-                    for (Block block : fallingBlocks) {
-                        player.getWorld().spawnFallingBlock(block.getLocation(), block.getType(), (byte) 0);
-                        block.setType(Material.AIR);
-                        fallingBlocks.remove(block);
+                    for (int y = drawLocation.getBlockY(); y <= drawLocation.getBlockY() + 10; y++) {
+                        removeOutsideBlocks(player, y);
                     }
                 }
             }, 1L);
