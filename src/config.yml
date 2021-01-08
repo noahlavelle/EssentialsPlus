@@ -126,3 +126,114 @@ shrinkingcircle:
       item: NETHER_STAR
       name: 'Start'
       lore: ''
+
+lavafloor:
+  gui:
+    1:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    2:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    3:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    4:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    5:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    6:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    7:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    8:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    9:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    10:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    11:
+      item: LAVA_BUCKET
+      name: 'Material'
+      lore: ''
+    12:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    13:
+      item: SNOW
+      name: 'Start Layer'
+      lore: ''
+    14:
+      item: WHITE_STAINED_GLASS_PANE
+      name: 'Shrink Size'
+      lore: ''
+    15:
+      item: CLOCK
+      name: 'Rise Time'
+      lore: ''
+    16:
+      item: WHITE_STAINED_GLASS_PANE
+      name: 'Shrink Size'
+      lore: ''
+    17:
+      item: BARRIER
+      name: 'Border Size'
+      lore: ''
+    18:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    19:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    20:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    21:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    22:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    23:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    24:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    25:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    26:
+      item: WHITE_STAINED_GLASS_PANE
+      name: ''
+      lore: ''
+    27:
+      item: NETHER_STAR
+      name: 'Start'
+      lore: ''

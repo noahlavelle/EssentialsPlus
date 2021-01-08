@@ -1,6 +1,7 @@
 package com.noahlavelle.essentialsplus.games;
 
 import com.noahlavelle.essentialsplus.Main;
+import com.noahlavelle.essentialsplus.utils.CreateGui;
 import com.noahlavelle.essentialsplus.utils.RandomFirework;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -13,23 +14,157 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerChatEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-public class LavaFloor  implements CommandExecutor {
+public class LavaFloor  implements CommandExecutor, Listener {
 
     private Main plugin;
 
     static Map<UUID, Game> games = new HashMap<>();
+    static Map<UUID, Inventory> guis = new HashMap<>();
+
+    ArrayList<UUID> players = new ArrayList<>();
+    ArrayList<UUID> deadPlayers = new ArrayList<>();
+
+    private Inventory gui;
+    private String[] strings = {"lava", "100", "40", "10"};
+    private int awaitingValueStage;
 
     public LavaFloor (Main plugin) {
         this.plugin = plugin;
 
         plugin.getCommand("lavafloor").setExecutor(this);
+    }
+
+    @org.bukkit.event.EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        gui = guis.get(event.getWhoClicked().getUniqueId());
+        if (event.getInventory() != gui) return;
+
+        event.setCancelled(true);
+
+        final ItemStack clickedItem = event.getCurrentItem();
+
+        if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
+
+        Player player = (Player) event.getWhoClicked();
+
+        switch (event.getRawSlot()) {
+            case 10:
+                player.closeInventory();
+                player.sendMessage(ChatColor.GREEN + "[Floor is Lava] Please enter a valid material:");
+                awaitingValueStage = 1;
+            break;
+            case 12:
+                player.closeInventory();
+                player.sendMessage(ChatColor.GREEN + "[Floor is Lava] Please enter a start layer::");
+                awaitingValueStage = 3;
+            break;
+            case 14:
+                player.closeInventory();
+                player.sendMessage(ChatColor.GREEN + "[Floor is Lava] Please enter a valid rise delay");
+                awaitingValueStage = 4;
+            break;
+            case 16:
+                player.closeInventory();
+                player.sendMessage(ChatColor.GREEN + "[Floor is Lava] Please enter a valid rise size:");
+                awaitingValueStage = 2;
+            break;
+            case 26:
+                player.closeInventory();
+                Game game = new Game(players, deadPlayers, Material.getMaterial(strings[0].toUpperCase()), Integer.parseInt(strings[1]), Integer.parseInt(strings[2]), player.getLocation(),
+                    player, plugin, Integer.parseInt(strings[3]));
+                for (UUID u : game.players) {
+                    games.put(u, game);
+                }
+
+                game.run();
+            break;
+        }
+
+    }
+
+    @org.bukkit.event.EventHandler
+    public void onAsyncChatEvent(PlayerChatEvent event) {
+        if (!(event.getPlayer() instanceof Player)) return;
+
+        Player player = event.getPlayer();
+
+        if (player != player) return;
+
+        switch (awaitingValueStage) {
+            case 1:
+                try {
+
+                    Material.getMaterial(event.getMessage().toUpperCase());
+
+                } catch (Exception e) {
+                    player.sendMessage(ChatColor.RED + "[Floor is Lava] Invalid value\n" + ChatColor.GREEN + "Please enter a valid material:");
+                    event.setCancelled(true);
+                    return;
+                }
+
+                strings[0] = event.getMessage();
+                player.openInventory(gui);
+                event.setCancelled(true);
+                break;
+            case 2:
+                try {
+
+                    Integer.parseInt(event.getMessage());
+
+                } catch (Exception e) {
+                    player.sendMessage(ChatColor.RED + "[Floor is Lava] Invalid value\n" + ChatColor.GREEN + "Please enter a valid size:");
+                    event.setCancelled(true);
+                    return;
+                }
+
+                strings[1] = event.getMessage();
+                player.openInventory(gui);
+                event.setCancelled(true);
+                break;
+            case 3:
+                try {
+
+                    Integer.parseInt(event.getMessage());
+
+                } catch (Exception e) {
+                    player.sendMessage(ChatColor.RED + "[Floor is Lava] Invalid value\n" + ChatColor.GREEN + "Please enter a valid start layer:");
+                    event.setCancelled(true);
+                    return;
+                }
+
+                strings[2] = event.getMessage();
+                player.openInventory(gui);
+                event.setCancelled(true);
+                break;
+            case 4:
+                try {
+
+                    Integer.parseInt(event.getMessage());
+
+                } catch (Exception e) {
+                    player.sendMessage(ChatColor.RED + "[Floor is Lava] Invalid value\n" + ChatColor.GREEN + "Please enter a valid rise delay (seconds):");
+                    event.setCancelled(true);
+                    return;
+                }
+
+                strings[3] = event.getMessage();
+                player.openInventory(gui);
+                event.setCancelled(true);
+
+                break;
+        }
+
+        player.openInventory(gui);
     }
 
     @Override
@@ -42,27 +177,11 @@ public class LavaFloor  implements CommandExecutor {
 
         Player player = ((Player) commandSender).getPlayer();
 
-        ArrayList<UUID> players = new ArrayList<>();
-        ArrayList<UUID> deadPlayers = new ArrayList<>();
-
         Material material = Material.LAVA;
         int size = 100;
         int startLevel = 40;
         int delay = 10;
         Location centerLocation = player.getLocation();
-
-       try {
-           material = Material.getMaterial(strings[0].toUpperCase());
-           size = Integer.parseInt(strings[1]);
-           startLevel = Integer.parseInt(strings[2]);
-           delay = Integer.parseInt(strings[3]);
-       } catch (Exception e) {
-           commandSender.sendMessage(ChatColor.RED + "[Lava Floor] Please enter a valid material, size, start level and rise delay");
-       }
-
-       WorldBorder worldBorder = player.getWorld().getWorldBorder();
-       worldBorder.setCenter(centerLocation);
-       worldBorder.setSize(size);
 
        for (Entity e : player.getNearbyEntities(50, 50, 50)) {
            if (e instanceof Player) {
@@ -70,20 +189,51 @@ public class LavaFloor  implements CommandExecutor {
            }
        }
 
-       players.add(player.getUniqueId());
+       if (strings.length < 4) {
+           gui = new CreateGui(plugin, "lavafloor.gui.", "The Floor Is Lava").createGui();
 
-       Game game = new Game (players, deadPlayers, material, size, startLevel, centerLocation, player, plugin, delay);
+           player.openInventory(gui);
+           guis.put(player.getUniqueId(), gui);
+       } else {
 
-       for (UUID u : players) {
-           games.put(u, game);
+           try {
+               material = Material.getMaterial(strings[0].toUpperCase());
+               size = Integer.parseInt(strings[1]);
+               startLevel = Integer.parseInt(strings[2]);
+               delay = Integer.parseInt(strings[3]);
+           } catch (Exception e) {
+               commandSender.sendMessage(ChatColor.RED + "[Lava Floor] Please enter a valid material, size, start level and rise delay");
+           }
+
+           players.add(player.getUniqueId());
+
+
+           Game game = new Game(players, deadPlayers, material, size, startLevel, centerLocation, player, plugin, delay);
+
+           for (UUID u : players) {
+               games.put(u, game);
+               Bukkit.getPlayer(u).teleport(player);
+           }
+
+           game.run();
        }
-
-       game.run();
 
        return true;
     }
 
     public static class EventHandler implements Listener {
+
+        @org.bukkit.event.EventHandler
+        public void onEntityDamageEvent(EntityDamageEvent event) {
+            if (!(event.getEntity() instanceof Player)) return;
+
+            Player player = (Player) event.getEntity();
+
+            Game game = getPlayersGame(player.getUniqueId());
+            if (game == null) return;
+
+            game.entityDamage(event);
+        }
 
         @org.bukkit.event.EventHandler
         public void onPlayerDeath(PlayerDeathEvent event) {
@@ -114,7 +264,9 @@ public class LavaFloor  implements CommandExecutor {
         private ArrayList<UUID> deadPlayers;
         private ArrayList<UUID> players;
         private World world;
+
         private boolean running = true;
+        private BossBar bossBar;
 
         public Game (ArrayList<UUID> players, ArrayList<UUID> deadPlayers, Material material, int size, int startLevel, Location centerLocation, Player player, Main plugin, int delay) {
             this.players = players;
@@ -131,7 +283,9 @@ public class LavaFloor  implements CommandExecutor {
 
         public void run () {
 
-            BossBar bossBar;
+            WorldBorder worldBorder = player.getWorld().getWorldBorder();
+            worldBorder.setCenter(centerLocation);
+            worldBorder.setSize(size);
 
             bossBar = Bukkit.createBossBar(ChatColor.LIGHT_PURPLE + "Blocks rising in " + delay + " seconds", BarColor.PINK, BarStyle.SOLID);
 
@@ -195,7 +349,7 @@ public class LavaFloor  implements CommandExecutor {
                     Block block = world.getBlockAt(x, y, z);
                     Material blockType = block.getType();
 
-                    if (blockType == Material.AIR) {
+                    if (blockType == Material.AIR | blockType == Material.GRASS |blockType == Material.TALL_GRASS | blockType == Material.SNOW) {
                         block.setType(material);
                     }
                 }
@@ -216,6 +370,12 @@ public class LavaFloor  implements CommandExecutor {
             killed.setHealth(20);
 
             setPlayerSpectate(event.getEntity());
+        }
+
+        public void entityDamage(EntityDamageEvent event) {
+            if (deadPlayers.contains(event.getEntity().getUniqueId())) {
+                event.setCancelled(true);
+            }
         }
 
         public void setPlayerSpectate(Player player) {
@@ -243,6 +403,10 @@ public class LavaFloor  implements CommandExecutor {
         }
 
         public void win(UUID uuid) {
+
+            bossBar.removeAll();
+            running = false;
+
             Player player = Bukkit.getPlayer(uuid);
             for (int i = 0; i < 25; i++) {
                 plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
