@@ -34,3 +34,9 @@ commands:
     description: A game where a circle shrinks and the last player alive wins
     usage: /shrinkingcircle <radius> <shrink size> <auto progress time (manual if blank) (on death if death)>
     permission: custome.games.shrinkingcircle
+
+  lavafloor:
+    description: A floor is lava style game
+    usage: /shrinkingcircle <material> <size>
+    permission: custome.games.lavafloor
+

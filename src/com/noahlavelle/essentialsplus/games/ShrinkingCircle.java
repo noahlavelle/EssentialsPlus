@@ -25,7 +25,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class ShrinkingCircle implements CommandExecutor, Listener {
@@ -523,7 +522,6 @@ public class ShrinkingCircle implements CommandExecutor, Listener {
         }
 
         public void playerDeath(PlayerDeathEvent event) {
-            if (!(event.getEntity().getKiller() instanceof Player)) return;
 
             Player killed = event.getEntity();
             Player killer = event.getEntity().getKiller();
