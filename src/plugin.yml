@@ -37,6 +37,11 @@ commands:
 
   lavafloor:
     description: A floor is lava style game
-    usage: /shrinkingcircle <material> <size>
+    usage: /shrinkingcircle <material> <size> <starting y> <rise delay>
     permission: custome.games.lavafloor
+
+  bedwars:
+    description: Bedwars
+    usage: /bedwars
+    permission: custome.games.bedwars
 

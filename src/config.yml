@@ -13,6 +13,110 @@ blocktrail:
 heal:
   healed: "[EssentialsPlus] You have been healed"
 
+bedwars:
+  bw_speedway:
+    generators:
+      base:
+        red:
+          - -32
+          - 65
+          - -86.5
+        blue:
+          - 32
+          - 65
+          - -86.5
+        green:
+          - 86.5
+          - 65
+          - -32
+        yellow:
+          - 86.5
+          - 65
+          - 32
+        aqua:
+          - 32
+          - 65
+          - 86.5
+        white:
+          - 32
+          - 65
+          - 86.5
+        pink:
+          - -86.5
+          - 65
+          - 32
+        gray:
+          - 86.5
+          - 65
+          - -32
+      diamond:
+        1:
+          - -32
+          - 65
+          - -32
+        2:
+          - 32
+          - 65
+          - -32
+        3:
+          - 32
+          - 65
+          - 32
+        4:
+          - -32
+          - 65
+          - 32
+      emerald:
+        1:
+          - -12
+          - 66
+          - 15
+        2:
+          - -3
+          - 56
+          - 8
+        3:
+          - 3
+          - 56
+          - -8
+        4:
+          - 12
+          - 66
+          - -15
+    beds:
+      red:
+        - -32
+        - 67
+        - -70
+      blue:
+        - 32
+        - 67
+        - -70
+      green:
+        - 70
+          67
+          -32
+      yellow:
+        - 70
+        - 67
+        - 32
+      aqua:
+        - 32
+        - 67
+        - 70
+      white:
+        - -32
+        - 67
+        - 70
+      pink:
+        - -70
+        - 67
+        - 32
+      gray:
+        - -70
+        - 67
+        - -32
+
 shrinkingcircle:
   gui:
     1:

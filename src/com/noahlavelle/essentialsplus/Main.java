@@ -4,6 +4,7 @@ import com.noahlavelle.essentialsplus.commnds.FlyCommand;
 import com.noahlavelle.essentialsplus.commnds.HealCommand;
 import com.noahlavelle.essentialsplus.commnds.HealthCommand;
 import com.noahlavelle.essentialsplus.commnds.SpeedCommand;
+import com.noahlavelle.essentialsplus.games.BedWars;
 import com.noahlavelle.essentialsplus.games.BlockTrail;
 import com.noahlavelle.essentialsplus.games.LavaFloor;
 import com.noahlavelle.essentialsplus.games.ShrinkingCircle;
@@ -20,6 +21,7 @@ public class Main extends JavaPlugin {
         new HealCommand(this);
         new SpeedCommand(this);
         new HealthCommand(this);
+        new BedWars(this);
 
         getServer().getPluginManager().registerEvents(new JoinMessage(), this);
         getServer().getPluginManager().registerEvents(new ShrinkingCircle(this), this);
