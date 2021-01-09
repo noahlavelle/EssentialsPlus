@@ -29,6 +29,8 @@ public class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new LavaFloor(this), this);
         getServer().getPluginManager().registerEvents(new LavaFloor.EventHandler(), this);
         getServer().getPluginManager().registerEvents(new BlockTrail(this), this);
+
+        getServer().getPluginManager().registerEvents(new BedWars.Game(), this);
         getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "[EssentialsPlus] Plugin is enabled");
     }
 

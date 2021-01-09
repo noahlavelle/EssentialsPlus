@@ -7,11 +7,11 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class BedWars implements CommandExecutor {
 
@@ -38,6 +38,7 @@ public class BedWars implements CommandExecutor {
             joinGame(player, pendingGames.get(pendingGames.keySet().toArray()[0]));
         }
 
+
         return false;
     }
 
@@ -45,19 +46,20 @@ public class BedWars implements CommandExecutor {
         Random random = new Random(System.currentTimeMillis());
         String id = generateGameID(random);
 
-        Game game = new Game (id);
+        Game game = new Game (id, plugin);
 
         pendingGames.put(id, game);
 
         World source = Bukkit.getWorld("bw-speedway");
         WorldManager.copyWorld(source, "bw-" + id);
 
-       ;
-
-        String[] spawnCoords =  plugin.getConfig().getString("bedwars.bw-speedway.spawnPoints.wait");
-
-        Location mapTP = new Location(Bukkit.getWorld("bw-" + id), 0, 100, 0);
+        Location mapTP = new Location(Bukkit.getWorld("bw-" + id), Integer.parseInt(plugin.getConfig().getString("bedwars.bw_speedway.spawn_points.wait.x")),
+                Integer.parseInt(plugin.getConfig().getString("bedwars.bw_speedway.spawn_points.wait.y")),
+                Integer.parseInt(plugin.getConfig().getString("bedwars.bw_speedway.spawn_points.wait.z")));
         player.teleport(mapTP);
+
+        game.players.add(player.getUniqueId());
+
     }
 
     public String generateGameID (Random random) {
@@ -78,19 +80,66 @@ public class BedWars implements CommandExecutor {
 
     public void joinGame (Player player, Game game) {
         System.out.println(game.id);
-        Location mapTP = new Location(Bukkit.getWorld("bw-" + game.id), 0, 100, 0);
+
+        Location mapTP = new Location(Bukkit.getWorld("bw-" + game.id), Integer.parseInt(plugin.getConfig().getString("bedwars.bw_speedway.spawn_points.wait.x")),
+                Integer.parseInt(plugin.getConfig().getString("bedwars.bw_speedway.spawn_points.wait.y")),
+                Integer.parseInt(plugin.getConfig().getString("bedwars.bw_speedway.spawn_points.wait.z")));
         player.teleport(mapTP);
+
+        game.players.add(player.getUniqueId());
     }
 
-    public static class Game {
+    public static class Game implements Listener {
+
+        private Main plugin;
+        private Map<String, String> teams = new HashMap<>();
 
         String id;
 
-        public Game (String id) {
+        public Game (String id, Main plugin) {
+            this.plugin = plugin;
             this.id = id;
         }
 
-        ArrayList<Player> players = new ArrayList<>();
+        public Game () {
+        }
+
+
+        ArrayList<UUID> players = new ArrayList<>();
+
+        @EventHandler
+        public void playerJoinWorld(PlayerChangedWorldEvent event) {
+
+            if (event.getPlayer().getWorld() == Bukkit.getWorld("bw-" + id)) {
+                System.out.println("run");
+                initGame();
+            }
+        }
+
+
+        public void initGame() {
+            populateTeams();
+            createGenerators();
+            teleportPlayers();
+
+            System.out.println(teams);
+        }
+
+        // Game Initialisation
+
+        public void populateTeams () {
+            for (String team : plugin.getConfig().getConfigurationSection("bedwars.bw_speedway.teams").getKeys(false)) {
+                teams.put(team, plugin.getConfig().getString("bedwars.bw_speedway.teams." + team)); // UNTESTED CODE
+            }
+        }
+
+        public void createGenerators () {
+
+        }
+
+        public void teleportPlayers () {
+
+        }
 
     }
 }

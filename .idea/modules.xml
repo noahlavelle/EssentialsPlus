@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CustomEssentials.iml" filepath="$PROJECT_DIR$/CustomEssentials.iml" />
+      <module fileurl="file://$PROJECT_DIR$/EssentialsPlus.iml" filepath="$PROJECT_DIR$/EssentialsPlus.iml" />
     </modules>
   </component>
 </project>
