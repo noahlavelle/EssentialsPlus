@@ -15,6 +15,43 @@ heal:
 
 bedwars:
   bw_speedway:
+    spawnPoints:
+      wait:
+        - 1
+        - 129
+          4
+      red:
+        - -32
+        - 66
+        - -81
+      blue:
+        - 32
+        - 66
+        - -81
+      green:
+        - 81
+        - 66
+        - -32
+      yellow:
+        - 81
+        - 66
+        - 32
+      aqua:
+        - 32
+        - 66
+        - 81
+      white:
+        - -32
+        - 66
+        - 81
+      pink:
+        - -81
+        - 66
+        - 32
+      gray:
+        - -81
+        - 66
+        - -32
     generators:
       base:
         red:
