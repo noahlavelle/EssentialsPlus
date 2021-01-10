@@ -14,7 +14,7 @@ heal:
   healed: "[EssentialsPlus] You have been healed"
 
 bedwars:
-  bw_speedway:
+  bw-lighthouse:
     teams:
       red: "RED"
       blue: "BLUE"
@@ -27,75 +27,75 @@ bedwars:
 
     spawn_points:
       wait:
-        x: 1
-        y: 129
-        z: 4
+        x: 0
+        y: 118
+        z: 0
       red:
-        x: -32
-        y: 66
-        z: -81
+        x: -23
+        y: 65
+        z: -87
       blue:
-        x: 32
-        y: 66
-        z: -81
+        x:
+        y:
+        z:
       green:
-        x: 81
-        y: 66
-        z: -32
+        x:
+        y:
+        z:
       yellow:
-        x: 81
-        y: 66
-        z: 32
+        x:
+        y:
+        z:
       aqua:
-        x: 32
-        y: 66
-        z: 81
+        x:
+        y:
+        z:
       white:
-        x: -32
-        y: 66
-        z: 81
+        x:
+        y:
+        z:
       pink:
-        x: -81
-        y: 66
-        z: 32
+        x:
+        y:
+        z:
       gray:
-        x: -81
-        y: 66
-        z: -32
+        x:
+        y:
+        z:
     generators:
       base:
         red:
-          x: -32
-          y: 65
-          z: -86.5
+          x: -23
+          y: 64.5
+          z: -91
         blue:
-          x: 32
-          y: 65
-          z: -86.5
+          x:
+          y:
+          z:
         green:
-          x: 86.5
-          y: 65
-          z: -32
+          x:
+          y:
+          z:
         yellow:
-          x: 86.5
-          y: 65
-          z: 32
+          x:
+          y:
+          z:
         aqua:
-          x: 32
-          y: 65
-          z: 86.5
+          x:
+          y:
+          z:
         white:
-          x: 32
-          y: 65
-          z: 86.5
+          x:
+          y:
+          z:
         pink:
-          x: -86.5
-          y: 65
-          z: 32
+          x:
+          y:
+          z:
         gray:
-          x: 86.5
-          y: 65
-          z: -32
+          x:
+          y:
+          z:
       diamond:
         1:
           x: -32
@@ -132,9 +132,9 @@ bedwars:
           z: -15
     beds:
       red:
-        x: -32
-        y: 67
-        z: -70
+        x: -23
+        y: 66
+        z: -75
       blue:
         x: 32
         y: 67

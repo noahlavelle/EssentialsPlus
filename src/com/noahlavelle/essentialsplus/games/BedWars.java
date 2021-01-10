@@ -1,6 +1,7 @@
 package com.noahlavelle.essentialsplus.games;
 
 import com.noahlavelle.essentialsplus.Main;
+import com.noahlavelle.essentialsplus.utils.RandomFirework;
 import com.noahlavelle.essentialsplus.utils.WorldManager;
 import org.bukkit.*;
 import org.bukkit.command.Command;
@@ -20,6 +21,7 @@ public class BedWars implements CommandExecutor {
     String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     Map<String, Game> pendingGames = new HashMap<>();
+    static Map<UUID, Game> games = new HashMap<>();
 
     public BedWars (Main plugin) {
         this.plugin = plugin;
@@ -50,16 +52,28 @@ public class BedWars implements CommandExecutor {
 
         pendingGames.put(id, game);
 
-        World source = Bukkit.getWorld("bw-speedway");
+        World source = Bukkit.getWorld("bw-lighthouse");
         WorldManager.copyWorld(source, "bw-" + id);
 
-        Location mapTP = new Location(Bukkit.getWorld("bw-" + id), Integer.parseInt(plugin.getConfig().getString("bedwars.bw_speedway.spawn_points.wait.x")),
-                Integer.parseInt(plugin.getConfig().getString("bedwars.bw_speedway.spawn_points.wait.y")),
-                Integer.parseInt(plugin.getConfig().getString("bedwars.bw_speedway.spawn_points.wait.z")));
+        Location mapTP = new Location(Bukkit.getWorld("bw-" + id), Integer.parseInt(plugin.getConfig().getString("bedwars.bw_lighthouse.spawn_points.wait.x")),
+                Integer.parseInt(plugin.getConfig().getString("bedwars.bw_lighthouse.spawn_points.wait.y")),
+                Integer.parseInt(plugin.getConfig().getString("bedwars.bw_lighthouse.spawn_points.wait.z")));
+
+        games.put(player.getUniqueId(), game);
+        game.players.add(player.getUniqueId());
         player.teleport(mapTP);
 
-        game.players.add(player.getUniqueId());
+    }
 
+    public void joinGame (Player player, Game game) {
+
+        Location mapTP = new Location(Bukkit.getWorld("bw-" + game.id), Integer.parseInt(plugin.getConfig().getString("bedwars.bw_lighthouse.spawn_points.wait.x")),
+                Integer.parseInt(plugin.getConfig().getString("bedwars.bw_lighthouse.spawn_points.wait.y")),
+                Integer.parseInt(plugin.getConfig().getString("bedwars.bw_lighthouse.spawn_points.wait.z")));
+
+        games.put(player.getUniqueId(), game);
+        game.players.add(player.getUniqueId());
+        player.teleport(mapTP);
     }
 
     public String generateGameID (Random random) {
@@ -76,23 +90,55 @@ public class BedWars implements CommandExecutor {
             return id;
         }
 
+
     }
 
-    public void joinGame (Player player, Game game) {
-        System.out.println(game.id);
 
-        Location mapTP = new Location(Bukkit.getWorld("bw-" + game.id), Integer.parseInt(plugin.getConfig().getString("bedwars.bw_speedway.spawn_points.wait.x")),
-                Integer.parseInt(plugin.getConfig().getString("bedwars.bw_speedway.spawn_points.wait.y")),
-                Integer.parseInt(plugin.getConfig().getString("bedwars.bw_speedway.spawn_points.wait.z")));
-        player.teleport(mapTP);
+    public static class EventHandler implements Listener {
 
-        game.players.add(player.getUniqueId());
+        @org.bukkit.event.EventHandler
+        public void playerJoinWorld(PlayerChangedWorldEvent event) {
+
+            Player player = (Player) event.getPlayer();
+
+            Game game = getPlayersGame(player);
+            if (game == null) return;
+
+
+            if (player.getWorld() == Bukkit.getWorld("bw-" + game.id)) {
+
+                if (game.players.size() == 2) { // Change to 16 when done developing
+
+                    for (int i = 5; i >= 0; i--) {
+                        System.out.println(i);
+                        final int finalI = i;
+//                        game.plugin.getServer().getScheduler().runTaskLater(game.plugin, () -> {
+//                            for (UUID u : game.players) {
+//                                Player p = Bukkit.getPlayer(u);
+//                                p.sendTitle(ChatColor.RED + "" + finalI, "", 10, 100, 20);
+//                            }
+//
+//                            if (finalI == 0) {
+//                                game.initGame();
+//                            }
+//                        }, 20L * (5 - i));
+                    }
+                }
+            }
+        }
+
+        public Game getPlayersGame(Player player) {
+            Game game = games.get(player.getUniqueId());
+            return game;
+
+        }
     }
 
-    public static class Game implements Listener {
+    public static class Game {
 
         private Main plugin;
         private Map<String, String> teams = new HashMap<>();
+        private Map<UUID, String> playerTeams = new HashMap<>();
 
         String id;
 
@@ -107,29 +153,26 @@ public class BedWars implements CommandExecutor {
 
         ArrayList<UUID> players = new ArrayList<>();
 
-        @EventHandler
-        public void playerJoinWorld(PlayerChangedWorldEvent event) {
-
-            if (event.getPlayer().getWorld() == Bukkit.getWorld("bw-" + id)) {
-                System.out.println("run");
-                initGame();
-            }
-        }
-
-
         public void initGame() {
             populateTeams();
             createGenerators();
             teleportPlayers();
-
-            System.out.println(teams);
         }
 
         // Game Initialisation
 
         public void populateTeams () {
-            for (String team : plugin.getConfig().getConfigurationSection("bedwars.bw_speedway.teams").getKeys(false)) {
-                teams.put(team, plugin.getConfig().getString("bedwars.bw_speedway.teams." + team)); // UNTESTED CODE
+            List<String> teamAssign = new ArrayList<>();
+
+            for (String team : plugin.getConfig().getConfigurationSection("bedwars.bw_lighthouse.teams").getKeys(false)) {
+                teams.put(team, plugin.getConfig().getString("bedwars.bw_lighthouse.teams." + team));
+                teamAssign.add(team);
+                teamAssign.add(team);
+            }
+
+            for (UUID u : players) {
+                playerTeams.put(u, teamAssign.get(0));
+                teamAssign.remove(0);
             }
         }
 
@@ -138,7 +181,19 @@ public class BedWars implements CommandExecutor {
         }
 
         public void teleportPlayers () {
+            for (UUID u : playerTeams.keySet()) {
+                Player player = Bukkit.getPlayer(u);
+                String team = playerTeams.get(u);
 
+                Location location = new Location(player.getWorld(), Integer.parseInt(plugin.getConfig().getString("bedwars.bw_lighthouse.spawn_points." + team + ".x")),
+                        Integer.parseInt(plugin.getConfig().getString("bedwars.bw_lighthouse.spawn_points." + team + ".y")),
+                        Integer.parseInt(plugin.getConfig().getString("bedwars.bw_lighthouse.spawn_points." + team + ".z")));
+
+                player.teleport(location);
+                player.setDisplayName(ChatColor.getByChar(plugin.getConfig().getString("bedwars.bw_lighthouse.teams." + team)) + player.getDisplayName() + ChatColor.RESET);
+                player.setPlayerListName(ChatColor.getByChar(plugin.getConfig().getString("bedwars.bw_lighthouse.teams." + team)) + player.getDisplayName() + ChatColor.RESET);
+
+            }
         }
 
     }
