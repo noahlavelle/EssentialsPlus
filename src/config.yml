@@ -35,33 +35,33 @@ bedwars:
         y: 65
         z: -87
       blue:
-        x:
-        y:
-        z:
+        x: 29
+        y: 65
+        z: -87
       green:
-        x:
-        y:
-        z:
+        x: 90
+        y: 65
+        z: -26
       yellow:
-        x:
-        y:
-        z:
+        x: 90 65
+        y: 65
+        z: 26
       aqua:
-        x:
-        y:
-        z:
+        x: 29
+        y: 65
+        z: 87
       white:
-        x:
-        y:
-        z:
+        x: -23
+        y: 65
+        z: 87
       pink:
-        x:
-        y:
-        z:
+        x: -84
+        y: 65
+        z: 26
       gray:
-        x:
-        y:
-        z:
+        x: -84
+        y: 65
+        z: -26
     generators:
       base:
         red:
@@ -69,100 +69,101 @@ bedwars:
           y: 64.5
           z: -91
         blue:
-          x:
-          y:
-          z:
+          x: 29
+          y: 64.5
+          z: -91
         green:
-          x:
-          y:
-          z:
+          x: 94
+          y: 64.5
+          z: -26
         yellow:
-          x:
-          y:
-          z:
+          x: 94
+          y: 64.5
+          z: 26
         aqua:
-          x:
-          y:
-          z:
+          x: 29
+          y: 64.5
+          z: 91
         white:
-          x:
-          y:
-          z:
+          x: -23
+          y: 64.5
+          z: 91
         pink:
-          x:
-          y:
-          z:
+          x: -88
+          y: 64.5
+          z: 26
         gray:
-          x:
-          y:
-          z:
+          x: -88
+          y: 64.5
+          z: -26
       diamond:
         1:
-          x: -32
-          y: 65
-          z: -32
+          x: -49
+          y: 67
+          z: -52
         2:
-          x: 32
-          y: 65
-          z: -32
+          x: 55
+          y: 67
+          z: -52
         3:
-          x: 32
-          y: 65
-          z: 32
+          x: 55
+          y: 67
+          z: 52
         4:
-          x: -32
-          y: 65
-          z: 32
+          x: -49
+          y: 67
+          z: 52
       emerald:
         1:
-          x: -12
-          y: 66
-          z: 15
+          x: 13 65
+          y: 65
+          z: -14
         2:
-          x: -3
-          y: 56
-          z: 8
+          x: -7
+          y: 65
+          z: 14
         3:
           x: 3
-          y: 56
-          z: -8
+          y: 87
+          z: -7
         4:
-          x: 12
-          y: 66
-          z: -15
+          x: 3
+          y: 87
+          z: 7
     beds:
       red:
         x: -23
         y: 66
         z: -75
       blue:
-        x: 32
-        y: 67
-        z: -70
+        x: 26
+        y: 66
+        z: -75
       green:
-        x: 70
-        y: 67
-        z: -32
+        x: 78
+        y: 66
+        z: -26
       yellow:
-        x: 70
-        y: 67
-        z: 32
+        x: 78
+        y: 66
+        z: 26
       aqua:
-        x: 32
-        y: 67
-        z: 70
+        x: 29
+        y: 66
+        z: 75
       white:
-        x: -32
-        y: 67
-        z: 70
+        x: -23
+        y: 66
+        z: 75
       pink:
-        x: -70
-        y: 67
-        z: 32
+        x: -72
+        y: 66
+        z: 26
       gray:
-        x: -70
-        y: 67
-        z: -32
+        x: -72
+        y: 66
+        z: -26
+
 
 shrinkingcircle:
   gui:
