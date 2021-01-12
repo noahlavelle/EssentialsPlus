@@ -1,29 +1,59 @@
-player_only: "[EssentialsPlus] That command can only be executed by players"
-value_too_big: "[EssentialsPlus] Provided number was too big"
-value_nan: "[EssentialsPlus] The provided value was not a number"
+player_only: '[EssentialsPlus] That command can only be executed by players'
+value_too_big: '[EssentialsPlus] Provided number was too big'
+value_nan: '[EssentialsPlus] The provided value was not a number'
 
 fly:
-  enabled: "[EssentialsPlus] Fly has been enabled"
-  disabled: "[EssentialsPlus] Fly has been disabled"
+  enabled: '[EssentialsPlus] Fly has been enabled'
+  disabled: '[EssentialsPlus] Fly has been disabled'
 
 blocktrail:
-  enabled: "[EssentialsPlus] Blocktrail has been enabled"
-  disabled: "[EssentialsPlus] Blocktrail has been disabled"
+  enabled: '[EssentialsPlus] Blocktrail has been enabled'
+  disabled: '[EssentialsPlus] Blocktrail has been disabled'
 
 heal:
-  healed: "[EssentialsPlus] You have been healed"
+  healed: '[EssentialsPlus] You have been healed'
 
 bedwars:
+  footer_message: 'play.exampleserver.net'
+
+  generators:
+    base: 1
+    diamond: 30
+    emerald: 64
+
+  events:
+    diamond_2:
+      time: 6
+      message: 'Diamonds II'
+    emerald_2:
+      time: 6
+      message: 'Emeralds II'
+    diamond_3:
+      time: 6
+      message: 'Diamonds III'
+    emerald_3:
+      time: 6
+      message: 'Emeralds III'
+    beds_destroyed:
+      time: 6
+      message: 'Beds Destroyed'
+    sudden_death:
+      time: 10
+      message: 'Sudden Death'
+    game_over:
+      time: 10
+      message: 'Game Over'
+
   bw-lighthouse:
     teams:
-      red: "RED"
-      blue: "BLUE"
-      green: "GREEN"
-      yellow: "YELLOW"
-      aqua: "AQUA"
-      white: "WHITE"
-      pink: "LIGHT_PURPLE"
-      gray: "DARK_GRAY"
+      red: 'RED'
+      blue: 'BLUE'
+      green: 'GREEN'
+      yellow: 'YELLOW'
+      aqua: 'AQUA'
+      white: 'WHITE'
+      pink: 'LIGHT_PURPLE'
+      gray: 'DARK_GRAY'
 
     spawn_points:
       wait:
@@ -115,7 +145,7 @@ bedwars:
           z: 52
       emerald:
         1:
-          x: 13 65
+          x: 13
           y: 65
           z: -14
         2:
