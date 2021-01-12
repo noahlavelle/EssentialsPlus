@@ -7,22 +7,27 @@ import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Panda;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.util.BoundingBox;
+import org.bukkit.util.Vector;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class BedWars implements CommandExecutor {
 
-    private Main plugin;
+    static private Main plugin;
 
     String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -54,11 +59,14 @@ public class BedWars implements CommandExecutor {
         Random random = new Random(System.currentTimeMillis());
         String id = generateGameID(random);
 
-        Game game = new Game (id, plugin);
+        Game game = new Game (id, plugin, player);
 
         pendingGames.put(id, game);
 
         World source = Bukkit.getWorld("bw-lighthouse");
+
+        System.out.println(source);
+
         WorldManager.copyWorld(source, "bw-" + id);
 
         Location mapTP = new Location(Bukkit.getWorld("bw-" + id), Integer.parseInt(plugin.getConfig().getString("bedwars.bw-lighthouse.spawn_points.wait.x")),
@@ -145,6 +153,24 @@ public class BedWars implements CommandExecutor {
             }
         }
 
+        @org.bukkit.event.EventHandler
+        public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {
+            if (event.getRightClicked() instanceof Villager) {
+                if (event.getRightClicked().getCustomName().equals(ChatColor.AQUA + "ITEM SHOP")) {
+                    Inventory gui = Bukkit.createInventory(null, 36);
+
+                    for (String key : plugin.getConfig().getConfigurationSection("bedwars.shops.item_shop.general").getKeys(false)) {
+                        gui.setItem(Integer.parseInt(key) - 1, new ItemStack(Material.getMaterial(plugin.getConfig().getString("bedwars.shops.item_shop.general." + key + ".item")), 1));
+                    }
+
+                    event.getPlayer().openInventory(gui);
+
+                } else if (event.getRightClicked().getCustomName().equals(ChatColor.AQUA + "TEAM UPGRADES")) {
+
+                }
+            }
+        }
+
         public Game getPlayersGame(Player player) {
             Game game = games.get(player.getUniqueId());
             return game;
@@ -157,12 +183,14 @@ public class BedWars implements CommandExecutor {
         private Main plugin;
         private ArrayList<String> teams = new ArrayList<>();
         private Map<UUID, String> playerTeams = new HashMap<>();
+        private Player player;
 
         String id;
 
-        public Game (String id, Main plugin) {
+        public Game (String id, Main plugin, Player player) {
             this.plugin = plugin;
             this.id = id;
+            this.player = player;
         }
 
         public Game () {
@@ -175,6 +203,7 @@ public class BedWars implements CommandExecutor {
             populateTeams();
             createScoreboard();
             createGenerators();
+            createItemShops();
             teleportPlayers();
         }
 
@@ -261,6 +290,28 @@ public class BedWars implements CommandExecutor {
 
         }
 
+        public void createItemShops() {
+            for (Entity entity : player.getNearbyEntities(200, 200, 200)) {
+                if (entity instanceof Villager) {
+                    ArmorStand armourStand = (ArmorStand) player.getWorld().spawnEntity(new Location(entity.getWorld(), entity.getLocation().getX(), entity.getLocation().getY() - 0.3, entity.getLocation().getZ()), EntityType.ARMOR_STAND);
+                    armourStand.setGravity(false);
+                    armourStand.setCustomNameVisible(true);
+                    armourStand.setInvulnerable(true);
+                    armourStand.setInvisible(true);
+                    armourStand.setCustomName(ChatColor.YELLOW + "" + ChatColor.BOLD + "RIGHT CLICK");
+
+                    if (entity.getCustomName().equals("item_shop")) {
+                        entity.setCustomName(ChatColor.AQUA + "ITEM SHOP");
+                    }
+
+                    if (entity.getCustomName().equals("team_upgrades")) {
+                        entity.setCustomName(ChatColor.AQUA + "TEAM UPGRADES\n" + ChatColor.YELLOW + ChatColor.BOLD + "RIGHT CLICK");
+                    }
+
+                }
+            }
+        }
+
         public void teleportPlayers () {
             for (UUID u : playerTeams.keySet()) {
                 Player player = Bukkit.getPlayer(u);
@@ -306,9 +357,11 @@ public class BedWars implements CommandExecutor {
 
         public void spawnBase() {
 
-            location.getWorld().dropItem(location, new ItemStack(Material.IRON_INGOT, 1));
+            Item droppedItem = location.getWorld().dropItem(location, new ItemStack(Material.IRON_INGOT, 1));
+            droppedItem.setVelocity(new Vector(0, 0, 0));
             if (rand.nextInt(5) + 1 == 1) {
-                location.getWorld().dropItem(location, new ItemStack(Material.GOLD_INGOT, 1));
+                Item droppedGold = location.getWorld().dropItem(location, new ItemStack(Material.GOLD_INGOT, 1));
+                droppedGold.setVelocity(new Vector(0, 0, 0));
             }
 
             plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
@@ -317,7 +370,17 @@ public class BedWars implements CommandExecutor {
         }
 
         public void spawnDiamond() {
-            location.getWorld().dropItem(location, new ItemStack(Material.DIAMOND, 1));
+
+            Collection<Entity> nearbyItems = location.getWorld().getNearbyEntities(location, 2, 2 ,2);
+
+            for (Entity entity : nearbyItems) {
+                if (entity instanceof Item) {
+                }
+            }
+
+
+            Item droppedItem = location.getWorld().dropItem(location, new ItemStack(Material.DIAMOND, 1));
+            droppedItem.setVelocity(new Vector(0, 0, 0));
 
             plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
                 spawnDiamond();
@@ -325,7 +388,8 @@ public class BedWars implements CommandExecutor {
         }
 
         public void spawnEmerald() {
-            location.getWorld().dropItem(location, new ItemStack(Material.EMERALD, 1));
+            Item droppedItem = location.getWorld().dropItem(location, new ItemStack(Material.EMERALD, 1));
+            droppedItem.setVelocity(new Vector(0, 0, 0));
 
             plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
                 spawnEmerald();

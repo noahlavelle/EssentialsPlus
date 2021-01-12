@@ -44,6 +44,110 @@ bedwars:
       time: 10
       message: 'Game Over'
 
+  shops:
+    item_shop:
+      general:
+        2:
+          item: 'TERRACOTTA'
+          name: 'Blocks'
+          catagory: 'blocks'
+        3:
+          item: 'GOLDEN_SWORD'
+          name: 'Weapons'
+          catagory: 'weapons'
+        4:
+          item: 'CHAINMAIL_BOOTS'
+          name: 'Armour'
+          catagory: 'armour'
+        5:
+          item: 'STONE_PICKAXE'
+          name: 'Tools'
+          catagory: 'tools'
+        6:
+          item: 'BOW'
+          name: 'Bows'
+          catagory: 'Bow'
+        7:
+          item: 'BREWING_STAND'
+          name: 'Potions'
+          catagory: 'potions'
+        8:
+          item: 'TNT'
+          name: 'Utilities'
+          catagory: 'utilities'
+        11:
+          item: 'BLACK_STAINED_GLASS_PANE'
+          lore: '↑ Catagories\n↓Items'
+        12:
+          item: 'BLACK_STAINED_GLASS_PANE'
+          lore: '↑ Catagories\n↓Items'
+        13:
+          item: 'BLACK_STAINED_GLASS_PANE'
+          lore: '↑ Catagories\n↓Items'
+        14:
+          item: 'BLACK_STAINED_GLASS_PANE'
+          lore: '↑ Catagories\n↓Items'
+        15:
+          item: 'BLACK_STAINED_GLASS_PANE'
+          lore: '↑ Catagories\n↓Items'
+        16:
+          item: 'BLACK_STAINED_GLASS_PANE'
+          lore: '↑ Catagories\n↓Items'
+        17:
+          item: 'BLACK_STAINED_GLASS_PANE'
+          lore: '↑ Catagories\n↓Items'
+        20:
+          item: 'WHITE_WOOL'
+          iron: 4
+        21:
+          item: 'STONE_SWORD'
+          iron: 10
+        22:
+          item: 'CHAINMAIL_BOOTS'
+          iron: 40
+        23:
+          item: 'WOODEN_PICKAXE'
+          iron: 10
+        24:
+          item: 'BOW'
+          gold: 12
+        25:
+          item: 'POTION'
+          potion_type: 'INVISIBILITY'
+          emeralds: 2
+        26:
+          item: 'TNT'
+          gold: 4
+        29:
+          item: 'OAK_PLANKS'
+          gold: 4
+        30:
+          item: 'IRON_SWORD'
+          gold: 7
+        31:
+          item: 'IRON_BOOTS'
+          gold: 12
+        32:
+          item: 'SHEARS'
+          iron: 20
+        33:
+          item: 'ARROW'
+          count: 8
+          gold: 2
+        34:
+          item: 'POTION'
+          potion_type: 'SWIFTNESS'
+          gold: 4
+        35:
+          item: 'WATER'
+          gold: 3
+      blocks:
+      weapons:
+      tools:
+      bows:
+      potions:
+      utilities:
+
   bw-lighthouse:
     teams:
       red: 'RED'
@@ -95,71 +199,71 @@ bedwars:
     generators:
       base:
         red:
-          x: -23
+          x: -22.5
           y: 64.5
-          z: -91
+          z: -90.5
         blue:
-          x: 29
+          x: 29.5
           y: 64.5
-          z: -91
+          z: -90.5
         green:
-          x: 94
+          x: 94.5
           y: 64.5
-          z: -26
+          z: -25.5
         yellow:
-          x: 94
+          x: 94.5
           y: 64.5
-          z: 26
+          z: 26.5
         aqua:
-          x: 29
+          x: 29.5
           y: 64.5
-          z: 91
+          z: 91.5
         white:
-          x: -23
+          x: -22.5
           y: 64.5
-          z: 91
+          z: 91.5
         pink:
-          x: -88
+          x: -87.5
           y: 64.5
-          z: 26
+          z: 26.5
         gray:
-          x: -88
+          x: -87.5
           y: 64.5
-          z: -26
+          z: -25.5
       diamond:
         1:
-          x: -49
+          x: -48.5
           y: 67
-          z: -52
+          z: -51.5
         2:
-          x: 55
+          x: 55.5
           y: 67
-          z: -52
+          z: -51.5
         3:
-          x: 55
+          x: 55.5
           y: 67
-          z: 52
+          z: 52.5
         4:
-          x: -49
+          x: -48.5
           y: 67
-          z: 52
+          z: 52.5
       emerald:
         1:
-          x: 13
+          x: 13.5
           y: 65
-          z: -14
+          z: -13.5
         2:
-          x: -7
+          x: -6.5
           y: 65
-          z: 14
+          z: 14.5
         3:
-          x: 3
+          x: 3.5
           y: 87
-          z: -7
+          z: -6.5
         4:
-          x: 3
+          x: 3.5
           y: 87
-          z: 7
+          z: 7.5
     beds:
       red:
         x: -23
