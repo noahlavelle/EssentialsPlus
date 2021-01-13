@@ -10,11 +10,16 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.*;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Score;
@@ -28,6 +33,7 @@ import java.util.*;
 public class BedWars implements CommandExecutor {
 
     static private Main plugin;
+    static private Map<UUID, Inventory> inventories = new HashMap<>();
 
     String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -154,20 +160,79 @@ public class BedWars implements CommandExecutor {
         }
 
         @org.bukkit.event.EventHandler
+        public void onInventoryClickEvent (InventoryClickEvent event) {
+          Player player = (Player) event.getWhoClicked();
+
+            Inventory gui = inventories.get(player.getUniqueId());
+
+            int ironAmount = 0;
+            int goldAmount = 0;
+            int emeraldAmount = 0;
+
+            if (event.getInventory() != gui) return;
+
+            try {
+                gui.getItem(event.getRawSlot()).getType();
+            } catch (Exception e) {
+                return;
+            }
+
+            for (ItemStack item : player.getInventory().getContents()) {
+                if (item == null) continue;
+
+                if (item.getType() == Material.IRON_INGOT) ironAmount += item.getAmount();
+                else if (item.getType() == Material.GOLD_INGOT) goldAmount += item.getAmount();
+                else if (item.getType() == Material.EMERALD) emeraldAmount += item.getAmount();
+             }
+
+            ItemStack item = gui.getItem(event.getRawSlot());
+
+            try { int currencyAmount = 0;
+
+                if (plugin.getConfig().getString("bedwars.shops.item_shop.general." + (event.getRawSlot() + 1) + ".material").equals("IRON_INGOT")) currencyAmount = ironAmount;
+                else if (plugin.getConfig().getString("bedwars.shops.item_shop.general." + (event.getRawSlot() + 1) + ".material").equals("GOLD_INGOT")) currencyAmount = goldAmount;
+                else if (plugin.getConfig().getString("bedwars.shops.item_shop.general." + (event.getRawSlot() + 1) + ".material").equals("EMERALD")) currencyAmount = emeraldAmount;
+
+                if (Integer.parseInt(plugin.getConfig().getString("bedwars.shops.item_shop.general." + (event.getRawSlot() + 1) + ".cost")) <= currencyAmount) {
+                    player.getInventory().addItem(item);
+                    player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 0.1F);
+
+                    player.getInventory().removeItem(new ItemStack[] {
+                            new ItemStack(Material.valueOf(plugin.getConfig().getString("bedwars.shops.item_shop.general." + (event.getRawSlot() + 1) + ".material")),
+                                    Integer.parseInt(plugin.getConfig().getString("bedwars.shops.item_shop.general." + (event.getRawSlot() + 1) + ".cost"))) });
+                } else {
+                    player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 0.1F);
+                }} catch (Exception e) {
+                    if (item.getType() != null && plugin.getConfig().getString("bedwars.shops.item_shop.header." + (event.getRawSlot() + 1) + ".type").equals("category")) {
+                        Inventory category = Bukkit.createInventory(null, 36);
+                        category = createInventory(category, "bedwars.shops.item_shop." + plugin.getConfig().getString("bedwars.shops.item_shop.header." + (event.getRawSlot() + 1) + ".category") + ".");
+
+                        player.openInventory(category);
+                        inventories.put(player.getUniqueId(), category);
+                    }
+             }
+
+            event.setCancelled(true);
+        }
+
+        @org.bukkit.event.EventHandler
         public void playerInteractEntityEvent(PlayerInteractEntityEvent event) {
             if (event.getRightClicked() instanceof Villager) {
+                Inventory gui = null;
                 if (event.getRightClicked().getCustomName().equals(ChatColor.AQUA + "ITEM SHOP")) {
-                    Inventory gui = Bukkit.createInventory(null, 36);
+                    gui = Bukkit.createInventory(null, 36);
 
-                    for (String key : plugin.getConfig().getConfigurationSection("bedwars.shops.item_shop.general").getKeys(false)) {
-                        gui.setItem(Integer.parseInt(key) - 1, new ItemStack(Material.getMaterial(plugin.getConfig().getString("bedwars.shops.item_shop.general." + key + ".item")), 1));
-                    }
+                    gui = createInventory(gui, "bedwars.shops.item_shop.general.");
 
                     event.getPlayer().openInventory(gui);
 
                 } else if (event.getRightClicked().getCustomName().equals(ChatColor.AQUA + "TEAM UPGRADES")) {
 
                 }
+
+                inventories.put(event.getPlayer().getUniqueId(), gui);
+
+                event.setCancelled(true);
             }
         }
 
@@ -175,6 +240,59 @@ public class BedWars implements CommandExecutor {
             Game game = games.get(player.getUniqueId());
             return game;
 
+        }
+
+        public Inventory createInventory (Inventory inventory, String path) {
+            for (String key : plugin.getConfig().getConfigurationSection("bedwars.shops.item_shop.header").getKeys(false)) {
+                inventory = addItemToInventory(key, "bedwars.shops.item_shop.header.", inventory);
+            }
+
+
+            for (String key : plugin.getConfig().getConfigurationSection(path.substring(0, path.length() - 1)).getKeys(false)) {
+                inventory = addItemToInventory(key, path, inventory);
+            }
+
+            return inventory;
+        }
+
+        public Inventory addItemToInventory(String key, String path, Inventory inventory) {
+            int count = 1;
+
+            try {
+                count = Integer.parseInt(plugin.getConfig().getString(path + key + ".count"));
+            } catch (Exception e) {}
+
+            ItemStack item = new ItemStack(Material.getMaterial(plugin.getConfig().getString(path + key + ".item")), count);
+            ItemMeta meta = item.getItemMeta();
+            meta.setDisplayName(ChatColor.RESET + plugin.getConfig().getString(path + key + ".name"));
+
+            List<String> lore = new ArrayList<>();
+
+            if (plugin.getConfig().getString(path + key + ".type").equals("buy")) {
+
+                String currency = null;
+
+                if (plugin.getConfig().getString(path + key + ".material").equals("IRON_INGOT")) currency = "Iron";
+                if (plugin.getConfig().getString(path + key + ".material").equals("GOLD_INGOT")) currency = "Gold";
+                if (plugin.getConfig().getString(path + key + ".material").equals("EMERALD")) currency = "Emeralds";
+
+                lore.add(ChatColor.RESET + "" + ChatColor.WHITE + "Cost: " + ChatColor.GRAY + plugin.getConfig().getString(path + key + ".cost") + " " + currency);
+            }
+
+            meta.setLore(lore);
+
+            if (item.getType() != Material.POTION) {
+                item.setItemMeta(meta);
+            } else if (item.getType() == Material.POTION) {
+                PotionMeta potionMeta = (PotionMeta) item.getItemMeta();
+                potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 600, 0), false);
+                potionMeta.setDisplayName(ChatColor.RESET + plugin.getConfig().getString(path + key + ".name"));
+                potionMeta.setLore(lore);
+                item.setItemMeta(potionMeta);
+            }
+
+            inventory.setItem(Integer.parseInt(key) - 1, item);
+            return inventory;
         }
     }
 

@@ -46,102 +46,202 @@ bedwars:
 
   shops:
     item_shop:
-      general:
+      header:
+        1:
+          item: 'NETHER_STAR'
+          name: 'Back to Quick Buy'
+          type: 'category'
+          caragory: 'general'
         2:
           item: 'TERRACOTTA'
           name: 'Blocks'
-          catagory: 'blocks'
+          type: 'category'
+          category: 'blocks'
         3:
           item: 'GOLDEN_SWORD'
           name: 'Weapons'
-          catagory: 'weapons'
+          type: 'category'
+          category: 'weapons'
         4:
           item: 'CHAINMAIL_BOOTS'
           name: 'Armour'
-          catagory: 'armour'
+          type: 'category'
+          category: 'armour'
         5:
           item: 'STONE_PICKAXE'
           name: 'Tools'
-          catagory: 'tools'
+          type: 'category'
+          category: 'tools'
         6:
           item: 'BOW'
           name: 'Bows'
-          catagory: 'Bow'
+          type: 'category'
+          category: 'Bow'
         7:
           item: 'BREWING_STAND'
+          type: 'category'
           name: 'Potions'
-          catagory: 'potions'
+          category: 'potions'
         8:
           item: 'TNT'
           name: 'Utilities'
-          catagory: 'utilities'
+          type: 'category'
+          category: 'utilities'
         11:
           item: 'BLACK_STAINED_GLASS_PANE'
-          lore: '↑ Catagories\n↓Items'
+          type: 'filler'
+          name: '↑ Categories ↓ Items'
         12:
           item: 'BLACK_STAINED_GLASS_PANE'
-          lore: '↑ Catagories\n↓Items'
+          type: 'filler'
+          name: '↑ Categories ↓ Items'
         13:
           item: 'BLACK_STAINED_GLASS_PANE'
-          lore: '↑ Catagories\n↓Items'
+          type: 'filler'
+          name: '↑ Categories ↓ Items'
         14:
           item: 'BLACK_STAINED_GLASS_PANE'
-          lore: '↑ Catagories\n↓Items'
+          type: 'filler'
+          name: '↑ Categories ↓ Items'
         15:
           item: 'BLACK_STAINED_GLASS_PANE'
-          lore: '↑ Catagories\n↓Items'
+          type: 'filler'
+          name: '↑ Categories ↓ Items'
         16:
           item: 'BLACK_STAINED_GLASS_PANE'
-          lore: '↑ Catagories\n↓Items'
+          type: 'filler'
+          name: '↑ Categories ↓ Items'
         17:
           item: 'BLACK_STAINED_GLASS_PANE'
-          lore: '↑ Catagories\n↓Items'
+          type: 'filler'
+          name: '↑ Categories ↓ Items'
+
+      general:
         20:
           item: 'WHITE_WOOL'
-          iron: 4
+          name: 'Wool'
+          type: 'buy'
+          cost: 4
+          count: 16
+          material: 'IRON_INGOT'
         21:
           item: 'STONE_SWORD'
-          iron: 10
+          name: 'Stone Sword'
+          type: 'buy'
+          cost: 10
+          material: 'IRON_INGOT'
         22:
           item: 'CHAINMAIL_BOOTS'
-          iron: 40
+          name: 'Permanent Chainmail Armour'
+          type: 'buy'
+          cost: 40
+          material: 'IRON_INGOT'
         23:
           item: 'WOODEN_PICKAXE'
-          iron: 10
+          name: 'Wooden Pickaxe'
+          type: 'buy'
+          cost: 10
+          material: 'IRON_INGOT'
         24:
           item: 'BOW'
-          gold: 12
+          name: 'Bow'
+          type: 'buy'
+          cost: 12
+          material: 'GOLD_INGOT'
         25:
           item: 'POTION'
+          name: 'Invisibility Potion (30:00)'
+          type: 'buy'
           potion_type: 'INVISIBILITY'
-          emeralds: 2
+          cost: 2
+          material: 'EMERALD'
         26:
           item: 'TNT'
-          gold: 4
+          name: 'TNT'
+          type: 'buy'
+          cost: 5
+          material: 'GOLD_INGOT'
         29:
           item: 'OAK_PLANKS'
-          gold: 4
+          name: 'Wood'
+          type: 'buy'
+          count: 16
+          cost: 4
+          material: 'GOLD_INGOT'
         30:
           item: 'IRON_SWORD'
-          gold: 7
+          name: 'Iron Sword'
+          type: 'buy'
+          cost: 7
+          material: 'GOLD_INGOT'
         31:
           item: 'IRON_BOOTS'
-          gold: 12
+          name: 'Permanent Iron Armour'
+          type: 'buy'
+          cost: 12
+          material: 'GOLD_INGOT'
         32:
           item: 'SHEARS'
-          iron: 20
+          name: 'Shears'
+          type: 'buy'
+          cost: 20
+          material: 'IRON_INGOT'
         33:
           item: 'ARROW'
-          count: 8
-          gold: 2
+          name: 'Arrow'
+          type: 'buy'
+          count: 2
+          cost: 2
+          material: 'GOLD_INGOT'
         34:
           item: 'POTION'
-          potion_type: 'SWIFTNESS'
-          gold: 4
+          name: 'Speed Potion (45:00)'
+          type: 'buy'
+          potion_type: 'SPEED'
+          cost: 1
+          material: 'EMERALD_INGOT'
         35:
           item: 'WATER'
-          gold: 3
+          name: 'Water'
+          type: 'buy'
+          cost: 3
+          material: 'GOLD_INGOT'
       blocks:
+        21:
+          item: 'WHITE_WOOL'
+          name: 'Wool'
+          type: 'buy'
+          cost: 4
+          count: 16
+          material: 'IRON_INGOT'
+        22:
+          item: 'SMOOTH_SANDSTONE'
+          name: 'Sandstone'
+          type: 'buy'
+          cost: 12
+          count: 16
+          material: 'IRON_INGOT'
+        23:
+          item: 'END_STONE'
+          name: 'End Stone'
+          type: 'buy'
+          cost: 24
+          count: 16
+          material: 'IRON_INGOT'
+        24:
+          item: 'OAK_PLANKS'
+          name: 'Wood'
+          type: 'buy'
+          cost: 4
+          count: 16
+          material: 'GOLD_INGOT'
+        25:
+          item: 'OBSIDIAN'
+          name: 'Obsidian'
+          type: 'buy'
+          cost: 4
+          count: 4
+          material: 'EMERALD'
       weapons:
       tools:
       bows:
