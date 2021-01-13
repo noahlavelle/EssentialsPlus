@@ -34,6 +34,7 @@ public class BedWars implements CommandExecutor {
 
     static private Main plugin;
     static private Map<UUID, Inventory> inventories = new HashMap<>();
+    static private Map<UUID, String> inventoryCategories = new HashMap<>();
 
     String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -161,7 +162,10 @@ public class BedWars implements CommandExecutor {
 
         @org.bukkit.event.EventHandler
         public void onInventoryClickEvent (InventoryClickEvent event) {
-          Player player = (Player) event.getWhoClicked();
+            Player player = (Player) event.getWhoClicked();
+
+            Game game = getPlayersGame(player);
+            if (game == null) return;
 
             Inventory gui = inventories.get(player.getUniqueId());
 
@@ -183,34 +187,49 @@ public class BedWars implements CommandExecutor {
                 if (item.getType() == Material.IRON_INGOT) ironAmount += item.getAmount();
                 else if (item.getType() == Material.GOLD_INGOT) goldAmount += item.getAmount();
                 else if (item.getType() == Material.EMERALD) emeraldAmount += item.getAmount();
-             }
+            }
 
             ItemStack item = gui.getItem(event.getRawSlot());
 
-            try { int currencyAmount = 0;
+            try {
 
-                if (plugin.getConfig().getString("bedwars.shops.item_shop.general." + (event.getRawSlot() + 1) + ".material").equals("IRON_INGOT")) currencyAmount = ironAmount;
-                else if (plugin.getConfig().getString("bedwars.shops.item_shop.general." + (event.getRawSlot() + 1) + ".material").equals("GOLD_INGOT")) currencyAmount = goldAmount;
-                else if (plugin.getConfig().getString("bedwars.shops.item_shop.general." + (event.getRawSlot() + 1) + ".material").equals("EMERALD")) currencyAmount = emeraldAmount;
+                int currencyAmount = 0;
+                String catagory = inventoryCategories.get(player.getUniqueId());
 
-                if (Integer.parseInt(plugin.getConfig().getString("bedwars.shops.item_shop.general." + (event.getRawSlot() + 1) + ".cost")) <= currencyAmount) {
-                    player.getInventory().addItem(item);
+                if (catagory == null) catagory = "general";
+
+                if (plugin.getConfig().getString("bedwars.shops.item_shop." + catagory + "." + (event.getRawSlot() + 1) + ".material").equals("IRON_INGOT")) currencyAmount = ironAmount;
+                else if (plugin.getConfig().getString("bedwars.shops.item_shop." + catagory + "." + (event.getRawSlot() + 1) + ".material").equals("GOLD_INGOT")) currencyAmount = goldAmount;
+                else if (plugin.getConfig().getString("bedwars.shops.item_shop." + catagory + "." + (event.getRawSlot() + 1) + ".material").equals("EMERALD")) currencyAmount = emeraldAmount;
+
+                if (Integer.parseInt(plugin.getConfig().getString("bedwars.shops.item_shop." + catagory + "." + (event.getRawSlot() + 1) + ".cost")) <= currencyAmount) {
+
+                    ItemStack itemAdd = item;
+
+                    if (itemAdd.getType() == Material.WHITE_WOOL) {
+                        String color = plugin.getConfig().getString("bedwars.bw-lighthouse.teams." + game.playerTeams.get(player.getUniqueId()));
+                        itemAdd = new ItemStack(Material.valueOf(color + "_WOOL"), item.getAmount());
+                    }
+
+                    player.getInventory().addItem(itemAdd);
                     player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 0.1F);
 
                     player.getInventory().removeItem(new ItemStack[] {
-                            new ItemStack(Material.valueOf(plugin.getConfig().getString("bedwars.shops.item_shop.general." + (event.getRawSlot() + 1) + ".material")),
-                                    Integer.parseInt(plugin.getConfig().getString("bedwars.shops.item_shop.general." + (event.getRawSlot() + 1) + ".cost"))) });
+                            new ItemStack(Material.valueOf(plugin.getConfig().getString("bedwars.shops.item_shop." + catagory + "." + (event.getRawSlot() + 1) + ".material")),
+                                    Integer.parseInt(plugin.getConfig().getString("bedwars.shops.item_shop." + catagory + "." + (event.getRawSlot() + 1) + ".cost"))) });
                 } else {
                     player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 0.1F);
                 }} catch (Exception e) {
-                    if (item.getType() != null && plugin.getConfig().getString("bedwars.shops.item_shop.header." + (event.getRawSlot() + 1) + ".type").equals("category")) {
-                        Inventory category = Bukkit.createInventory(null, 36);
-                        category = createInventory(category, "bedwars.shops.item_shop." + plugin.getConfig().getString("bedwars.shops.item_shop.header." + (event.getRawSlot() + 1) + ".category") + ".");
+                if (item.getType() != null && plugin.getConfig().getString("bedwars.shops.item_shop.header." + (event.getRawSlot() + 1) + ".type").equals("category")) {
+                    Inventory category = Bukkit.createInventory(null, 36, plugin.getConfig().getString("bedwars.shops.item_shop.header." + (event.getRawSlot() + 1) + ".category"));
+                    category = createInventory(category, "bedwars.shops.item_shop." + plugin.getConfig().getString("bedwars.shops.item_shop.header." + (event.getRawSlot() + 1) + ".category") + ".");
+                    inventoryCategories.remove(player.getUniqueId());
+                    inventoryCategories.put(player.getUniqueId(), plugin.getConfig().getString("bedwars.shops.item_shop.header." + (event.getRawSlot() + 1) + ".category"));
 
-                        player.openInventory(category);
-                        inventories.put(player.getUniqueId(), category);
-                    }
-             }
+                    player.openInventory(category);
+                    inventories.put(player.getUniqueId(), category);
+                }
+            }
 
             event.setCancelled(true);
         }
@@ -285,7 +304,8 @@ public class BedWars implements CommandExecutor {
                 item.setItemMeta(meta);
             } else if (item.getType() == Material.POTION) {
                 PotionMeta potionMeta = (PotionMeta) item.getItemMeta();
-                potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.INVISIBILITY, 600, 0), false);
+                potionMeta.addCustomEffect(new PotionEffect(PotionEffectType.getByName(plugin.getConfig().getString(path + key + ".potion_type")), Integer.parseInt(plugin.getConfig().getString(path + key + ".duration")) * 20,
+                        Integer.parseInt(plugin.getConfig().getString(path + key + ".level")) - 1), true);
                 potionMeta.setDisplayName(ChatColor.RESET + plugin.getConfig().getString(path + key + ".name"));
                 potionMeta.setLore(lore);
                 item.setItemMeta(potionMeta);
@@ -463,13 +483,13 @@ public class BedWars implements CommandExecutor {
             switch (type) {
                 case "base":
                     spawnBase();
-                break;
+                    break;
                 case "diamond":
                     spawnDiamond();
-                break;
+                    break;
                 case "emerald":
                     spawnEmerald();
-                break;
+                    break;
             }
         }
 

@@ -74,9 +74,9 @@ bedwars:
           category: 'tools'
         6:
           item: 'BOW'
-          name: 'Bows'
+          name: 'Ranged'
           type: 'category'
-          category: 'Bow'
+          category: 'ranged'
         7:
           item: 'BREWING_STAND'
           type: 'category'
@@ -153,6 +153,8 @@ bedwars:
           name: 'Invisibility Potion (30:00)'
           type: 'buy'
           potion_type: 'INVISIBILITY'
+          duration: 30
+          level: 1
           cost: 2
           material: 'EMERALD'
         26:
@@ -190,7 +192,7 @@ bedwars:
           item: 'ARROW'
           name: 'Arrow'
           type: 'buy'
-          count: 2
+          count: 8
           cost: 2
           material: 'GOLD_INGOT'
         34:
@@ -198,8 +200,10 @@ bedwars:
           name: 'Speed Potion (45:00)'
           type: 'buy'
           potion_type: 'SPEED'
+          duration: 45
+          level: 2
           cost: 1
-          material: 'EMERALD_INGOT'
+          material: 'EMERALD'
         35:
           item: 'WATER'
           name: 'Water'
@@ -243,9 +247,122 @@ bedwars:
           count: 4
           material: 'EMERALD'
       weapons:
+        21:
+          item: 'STONE_SWORD'
+          name: 'Stone Sword'
+          type: 'buy'
+          cost: 10
+          material: 'IRON_INGOT'
+        22:
+          item: 'IRON_SWORD'
+          name: 'Iron Sword'
+          type: 'buy'
+          cost: 7
+          material: 'GOLD_INGOT'
+        23:
+          item: 'DIAMOND_SWORD'
+          name: 'Diamond Sword'
+          type: 'buy'
+          cost: 4
+          material: 'EMERALD'
+      armour:
+        22:
+          item: 'CHAINMAIL_BOOTS'
+          name: 'Permenant Chainmail Armour'
+          type: 'buy'
+          cost: 40
+          material: 'IRON_INGOT'
+        23:
+          item: 'IRON_BOOTS'
+          name: 'Permenant Iron Armour'
+          type: 'buy'
+          cost: 12
+          material: 'GOLD_INGOT'
+        24:
+          item: 'DIAMOND_BOOTS'
+          name: 'Permenant Diamond Armour'
+          type: 'buy'
+          cost: 6
+          material: 'EMERALD'
       tools:
-      bows:
+        20:
+          item: 'SHEARS'
+          name: 'Shears'
+          type: 'buy'
+          cost: 10
+          material: 'IRON_INGOT'
+        21:
+          item: 'WOODEN_AXE'
+          name: 'Stone Axe'
+          type: 'buy'
+          cost: 10
+          material: 'IRON_INGOT'
+        22:
+          item: 'WOODEN_PICKAXE'
+          name: 'Diamond Axe'
+          type: 'buy'
+          cost: 3
+          material: 'GOLD_INGOT'
+
+      ranged:
+        20:
+          item: 'ARROW'
+          name: 'Arrow'
+          type: 'buy'
+          cost: 2
+          count: 8
+          material: 'GOLD_INGOT'
+        21:
+          item: 'BOW'
+          name: 'Bow'
+          type: 'buy'
+          cost: 12
+          material: 'GOLD_INGOT'
+        22:
+          item: 'BOW'
+          name: 'Bow (Power I)'
+          type: 'buy'
+          enchantments:
+            1: 'POWER'
+          cost: 24
+          material: 'GOLD_INGOT'
+        23:
+          item: 'BOW'
+          name: 'Bow (Power I Punch I)'
+          type: 'buy'
+          enchantments:
+            1: 'POWER'
+            2: 'PUNCH'
+          cost: 6
+          material: 'EMERALD'
       potions:
+        20:
+          item: 'POTION'
+          name: 'Speed Potion (45:00)'
+          potion_type: 'SPEED'
+          duration: 45
+          level: 2
+          type: 'buy'
+          cost: 1
+          material: 'EMERALD'
+        21:
+          item: 'POTION'
+          name: 'Jump Potion V (45:00)'
+          potion_type: 'SPEED'
+          duration: 45
+          level: 5
+          cost: 1
+          type: 'buy'
+          material: 'EMERALD'
+        22:
+          item: 'POTION'
+          name: 'Invisibility Potion (30:00)'
+          potion_type: 'SPEED'
+          duration: 30
+          level: 1
+          type: 'buy'
+          cost: 1
+          material: 'EMERALD'
       utilities:
 
   bw-lighthouse:
