@@ -51,7 +51,7 @@ bedwars:
           item: 'NETHER_STAR'
           name: 'Back to Quick Buy'
           type: 'category'
-          caragory: 'general'
+          caregory: 'general'
         2:
           item: 'TERRACOTTA'
           name: 'Blocks'
@@ -293,10 +293,28 @@ bedwars:
           material: 'IRON_INGOT'
         21:
           item: 'WOODEN_AXE'
-          name: 'Stone Axe'
+          name: 'Wooden Axe'
           type: 'buy'
           cost: 10
           material: 'IRON_INGOT'
+          2:
+            item: 'STONE_AXE'
+            name: 'Stone Axe'
+            type: 'buy'
+            cost: 10
+            material: 'IRON_INGOT'
+          3:
+            item: 'IRON_AXE'
+            name: 'Iron Axe'
+            type: 'buy'
+            cost: 3
+            material: 'GOLD_INGOT'
+          4:
+            item: 'DIAMOND_AXE'
+            name: 'Diamond Axe'
+            type: 'buy'
+            cost: 6
+            material: 'GOLD_INGOT'
         22:
           item: 'WOODEN_PICKAXE'
           name: 'Diamond Axe'
@@ -364,6 +382,73 @@ bedwars:
           cost: 1
           material: 'EMERALD'
       utilities:
+        20:
+          item: 'GOLDEN_APPLE'
+          name: 'Golden Apple'
+          type: 'buy'
+          cost: 3
+          material: 'GOLD_INGOT'
+        21:
+          item: 'SNOWBALL'
+          name: 'Bed Bug'
+          type: 'buy'
+          cost: 40
+          material: 'IRON_INGOT'
+        22:
+          item: 'GHAST_SPAWN_EGG'
+          name: 'Dream Defender'
+          type: 'buy'
+          cost: 120
+          material: 'IRON_INGOT'
+        23:
+          item: 'FIRE_CHARGE'
+          name: 'Fireball'
+          type: 'buy'
+          cost: 40
+          material: 'IRON_INGOT'
+        24:
+          item: 'TNT'
+          name: 'TNT'
+          type: 'buy'
+          cost: 5
+          material: 'GOLD_INGOT'
+        25:
+          item: 'ENDER_PEARL'
+          name: 'Ender Pearl'
+          type: 'buy'
+          cost: 4
+          material: 'EMERALD'
+        26:
+          item: 'WATER_BUCKET'
+          name: 'Water'
+          type: 'buy'
+          cost: 3
+          material: 'GOLD_INGOT'
+        29:
+          item: 'EGG'
+          name: 'Bridge Egg'
+          type: 'buy'
+          cost: 1
+          material: 'EMERALD'
+        30:
+          item: 'MILK_BUCKET'
+          name: 'Magic Milk'
+          type: 'buy'
+          cost: 4
+          material: 'GOLD'
+        31:
+          item: 'SPONGE'
+          name: 'Sponge'
+          type: 'buy'
+          cost: 4
+          count: 4
+          material: 'GOLD_INGOT'
+        32:
+          item: 'CHEST'
+          name: 'Pop-Up Tower'
+          type: 'buy'
+          cost: 24
+          material: 'IRON_INGOT'
 
   bw-lighthouse:
     teams:
