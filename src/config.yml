@@ -294,9 +294,15 @@ bedwars:
         21:
           item: 'WOODEN_AXE'
           name: 'Wooden Axe'
-          type: 'buy'
+          type: 'tier'
           cost: 10
           material: 'IRON_INGOT'
+          1:
+            item: 'WOODEN_AXE'
+            name: 'Wooden Axe'
+            type: 'buy'
+            cost: 10
+            material: 'IRON_INGOT'
           2:
             item: 'STONE_AXE'
             name: 'Stone Axe'
