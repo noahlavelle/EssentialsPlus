@@ -176,13 +176,30 @@ public class BedWars implements CommandExecutor {
 
             int toolTier = 1;
 
+            player.getInventory().addItem(event.getInventory().getItem(event.getRawSlot()));
             for (ItemStack item : player.getInventory().getContents()) {
                 if (item == null) continue;
 
                 if (item.getType() == Material.IRON_INGOT) ironAmount += item.getAmount();
                 else if (item.getType() == Material.GOLD_INGOT) goldAmount += item.getAmount();
                 else if (item.getType() == Material.EMERALD) emeraldAmount += item.getAmount();
+
+                switch (item.getType()) {
+                    case WOODEN_AXE:
+                        toolTier = 2;
+                        break;
+                    case STONE_AXE:
+                        toolTier = 3;
+                        break;
+                    case IRON_AXE:
+                        toolTier = 4;
+                        break;
+                    case DIAMOND_AXE:
+                        toolTier = 5;
+                }
             }
+
+            player.getInventory().remove(event.getInventory().getItem(event.getRawSlot()));
 
             ItemStack item = gui.getItem(event.getRawSlot());
 
@@ -193,17 +210,36 @@ public class BedWars implements CommandExecutor {
 
                 if (category == null) category = "general";
 
-                if (plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + ".material").equals("IRON_INGOT")) currencyAmount = ironAmount;
-                else if (plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + ".material").equals("GOLD_INGOT")) currencyAmount = goldAmount;
-                else if (plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + ".material").equals("EMERALD")) currencyAmount = emeraldAmount;
+                String path = "bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + ".material";
+
+                if (toolTier > 1) {
+                    if (plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + ".type").equals("tier")) {
+                        path = "bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + "." + toolTier + ".material";
+                    }
+                }
+
+                switch (plugin.getConfig().getString(path)) {
+                    case "IRON_INGOT":
+                        currencyAmount = ironAmount;
+                        break;
+                    case "GOLD_INGOT":
+                        currencyAmount = goldAmount;
+                        break;
+                    case "EMERALD":
+                        currencyAmount = emeraldAmount;
+                        break;
+                }
 
                 int cost = 0;
 
+                cost = cost = Integer.parseInt(plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + ".cost"));
+
                 if (toolTier > 1) {
-                    cost = Integer.parseInt(plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + toolTier + "." + ".cost"));
-                } else {
-                    cost = Integer.parseInt(plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + ".cost"));
+                    if (plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + ".type").equals("tier")) {
+                        cost = Integer.parseInt(plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + "." + toolTier + ".cost"));
+                    }
                 }
+
 
                 Material material = Material.valueOf(plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + ".material"));
 
@@ -217,29 +253,21 @@ public class BedWars implements CommandExecutor {
                     }
 
                     player.getInventory().addItem(itemAdd);
-                    player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 0.1F);
 
                     for (ItemStack i : player.getInventory().getContents()) {
                         if (i == null) continue;
 
-                        switch (i.getType()) {
-                            case WOODEN_AXE:
-                                toolTier = 2;
-                                break;
-                            case STONE_AXE:
-                                toolTier = 3;
-                                break;
-                            case IRON_AXE:
-                                toolTier = 4;
-                                break;
-                            case DIAMOND_AXE:
-                                toolTier = 5;
-                        }
+
                     }
 
                     if (toolTier > 1) {
-                        System.out.println(plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + ".type"));
                         if (plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + ".type").equals("tier")) {
+                            if (plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + "." + (toolTier) + ".maxed").equals("true"))  {
+                                player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 0.1F);
+                                event.setCancelled(true);
+                                player.getInventory().removeItem(item);
+                                return;
+                            }
 
                             ItemContainer itemContainer = upgradeToolTier(item, cost, material, currencyAmount, category, event, toolTier, ironAmount, goldAmount, emeraldAmount);
                             item = itemContainer.item;
@@ -251,21 +279,30 @@ public class BedWars implements CommandExecutor {
 
                             String currency = "";
 
-                            if (plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + "." + toolTier + ".material").equals("IRON_INGOT"))
-                                currency = "Iron";
-                            else if (plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + "." + toolTier + ".material").equals("GOLD_INGOT"))
-                                currency = "Gold";
-                            else if (plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + "." + toolTier + ".material").equals("EMERALD"))
-                                currency = "Emeralds";
+                            switch (plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + "." + toolTier + ".material")) {
+                                case "IRON_INGOT":
+                                    currency = "Iron";
+                                    break;
+                                case "GOLD_INGOT":
+                                    currency = "Gold";
+                                    break;
+                                case "EMERALD":
+                                    currency = "Emeralds";
+                                    break;
+                            }
 
-                            if (plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + "." + toolTier + ".material").equals("IRON_INGOT")) {
-                                currencyAmount = ironAmount;
-                            } else if (plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + "." + toolTier + ".material").equals("GOLD_INGOT")) {
-                                currencyAmount = goldAmount;
-                                priceColor = ChatColor.GOLD;
-                            } else if (plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + "." + toolTier + ".material").equals("EMERALD")) {
-                                priceColor = ChatColor.DARK_GREEN;
-                                currencyAmount = emeraldAmount;
+                            switch (plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + "." + toolTier + ".material")) {
+                                case "IRON_INGOT":
+                                    currencyAmount = ironAmount;
+                                    break;
+                                case "GOLD_INGOT":
+                                    currencyAmount = goldAmount;
+                                    priceColor = ChatColor.GOLD;
+                                    break;
+                                case "EMERALD":
+                                    priceColor = ChatColor.DARK_GREEN;
+                                    currencyAmount = emeraldAmount;
+                                    break;
                             }
 
                             ItemMeta meta = item.getItemMeta();
@@ -287,15 +324,9 @@ public class BedWars implements CommandExecutor {
                             item.setItemMeta(meta);
                         }
                     }
-                    if (toolTier > 1) {
-                        if (plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + ".type").equals("tier")) {
-                            System.out.println(Material.valueOf(plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + "." + (toolTier - 2) + ".item")));
-                            player.getInventory().removeItem(new ItemStack(material, Integer.parseInt(plugin.getConfig().getString("bedwars.shops.item_shop." + category + "." + (event.getRawSlot() + 1) + "." + (toolTier - 1) + ".cost"))));
-                        }
-                    } else {
-                        player.getInventory().removeItem(new ItemStack(material,
-                                cost));
-                    }
+
+                    player.getInventory().removeItem(new ItemStack(material, cost));
+                    player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 1F, 0.1F);
 
                 } else {
                     player.playSound(player.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 0.1F);

@@ -137,11 +137,46 @@ bedwars:
           cost: 40
           material: 'IRON_INGOT'
         23:
-          item: 'WOODEN_PICKAXE'
-          name: 'Wooden Pickaxe'
-          type: 'buy'
+          item: 'WOODEN_AXE'
+          name: 'Wooden Axe'
+          type: 'tier'
           cost: 10
           material: 'IRON_INGOT'
+          1:
+            item: 'WOODEN_AXE'
+            name: 'Wooden Axe'
+            type: 'buy'
+            maxed: 'false'
+            cost: 10
+            material: 'IRON_INGOT'
+          2:
+            item: 'STONE_AXE'
+            name: 'Stone Axe'
+            type: 'buy'
+            maxed: 'false'
+            cost: 10
+            material: 'IRON_INGOT'
+          3:
+            item: 'IRON_AXE'
+            name: 'Iron Axe'
+            type: 'buy'
+            maxed: 'false'
+            cost: 3
+            material: 'GOLD_INGOT'
+          4:
+            item: 'DIAMOND_AXE'
+            name: 'Diamond Axe'
+            type: 'buy'
+            maxed: 'false'
+            cost: 6
+            material: 'GOLD_INGOT'
+          5:
+            item: 'DIAMOND_AXE'
+            name: 'Diamond Axe'
+            type: 'buy'
+            maxed: 'true'
+            cost: 0
+            material: 'GOLD_INGOT'
         24:
           item: 'BOW'
           name: 'Bow'
@@ -323,10 +358,34 @@ bedwars:
             material: 'GOLD_INGOT'
         22:
           item: 'WOODEN_PICKAXE'
-          name: 'Diamond Axe'
-          type: 'buy'
-          cost: 3
-          material: 'GOLD_INGOT'
+          name: 'Wooden Pickaxe'
+          type: 'tier'
+          cost: 10
+          material: 'IRON_INGOT'
+          1:
+            item: 'WOODEN_PICKAXE'
+            name: 'Wooden Pickaxe'
+            type: 'buy'
+            cost: 10
+            material: 'IRON_INGOT'
+          2:
+            item: 'STONE_PICKAXE'
+            name: 'Stone Pickaxe'
+            type: 'buy'
+            cost: 10
+            material: 'IRON_INGOT'
+          3:
+            item: 'IRON_PICKAXE'
+            name: 'Iron Pickaxe'
+            type: 'buy'
+            cost: 3
+            material: 'GOLD_INGOT'
+          4:
+            item: 'DIAMOND_PICKAXE'
+            name: 'Diamond Pickaxe'
+            type: 'buy'
+            cost: 6
+            material: 'GOLD_INGOT'
 
       ranged:
         20:
